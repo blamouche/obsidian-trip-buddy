@@ -365,10 +365,12 @@ Tous les réglages du module vivent dans `trip-buddy.json` à la racine du coffr
 - S'il contient une erreur de syntaxe, une notice le signale et les réglages en cours sont gardés : corrigez le fichier, il est relu aussitôt. Une clé absente reprend sa valeur par défaut.
 - Au premier lancement de cette version, il est créé à partir de `.obsidian/plugins/trip-buddy/data.json`, qui reste ensuite une **copie de secours** (ne pas la modifier).
 - Avec un outil de synchronisation, ce fichier voyage avec le coffre : les réglages sont les mêmes sur tous les appareils.
+- **Après une mise à jour du module**, le fichier est adapté tout seul au chargement : les nouveaux réglages prennent leur valeur par défaut ; si la version renomme ou transforme un réglage, une **migration** convertit l'ancienne valeur (numéro `settingsVersion`) ; une valeur au format inattendu (texte à la place d'un nombre, d'une liste…) est corrigée et signalée par une notice. Le fichier est alors réécrit une fois. Une liste personnalisée (catégories…) n'est complétée que si une migration le prévoit : un élément supprimé volontairement ne revient pas.
 
 | Clé | Contenu |
 | --- | --- |
 | `_info` | Rappel de l'usage du fichier (ignoré par le module). |
+| `settingsVersion` | Version du format des réglages, tenue par le module (migrations) : ne pas la modifier. |
 | `trip` | `name`, `destination`, `emoji`, `start` et `end` (`AAAA-MM-JJ`), `travelers` (liste de prénoms), `currency` (code ISO), `budget` (0 = somme des budgets par catégorie). |
 | `folders` · `files` · `templates` | Dossiers des rubriques, pages d'accueil des rubriques, modèles de notes. |
 | `poiCategories` | Catégories de lieux : `{ "id", "label", "icon", "color" }` ; `id` est la valeur de `category` dans les fiches POI. |
@@ -401,6 +403,7 @@ Sans connexion : les notes, le programme, le budget, le journal, les traces GPX,
 | `10-data.js` | Couche de données : POI, programmes, journal, budget, valise |
 | `15-gpx.js` · `16-transit.js` · `17-offline.js` | Traces GPX · transports en commun · tuiles hors ligne |
 | `20-map.js` | Carte Leaflet et panneau de filtres |
+| `02-settings-migrations.js` | Version des réglages (`SETTINGS_VERSION`), migrations de `trip-buddy.json` et contrôle des types |
 | `18-updater.js` | Mise à jour du module et des skills depuis GitHub (vérification, sauvegarde, installation, retour arrière) |
 | `30-modals.js` · `35-emoji.js` | Géocodage et fenêtres (lieu, dépense, programme, valise…) · sélecteur d'emoji et couleurs d'un emoji (`emojiPalette`, dégradé de l'en-tête) |
 | `40-blocks-poi.js` · `41-programme.js` · `42-budget.js` · `43-modules.js` | Blocs `tripbuddy-*` |

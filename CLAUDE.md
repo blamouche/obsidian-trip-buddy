@@ -53,6 +53,7 @@ Les dossiers réels sont définis dans les réglages (`folders` et `files` de `t
 
 - Toute modification visible (module, skills, modèles, coffre d'exemple) s'ajoute à la section `## [Non publié]` de `CHANGELOG.md` (*Ajouté* / *Modifié* / *Corrigé* / *Retiré*), en français.
 - Publier une version = `sh .github/scripts/release.sh X.Y.Z` (seulement à la demande de l'utilisateur) : met à jour CHANGELOG, `manifest.json` et le README, construit, commite, tague `vX.Y.Z` et pousse ; GitHub Actions publie alors le paquet `trip-buddy-vX.Y.Z.zip` (coffre prêt à ouvrir) sur Releases. Détails : README § *Versions et paquets*.
+- **Réglages du module** : un nouveau réglage s'ajoute dans `DEFAULT_SETTINGS` (`src/00-core.js`) et n'a pas besoin de migration. Renommer, déplacer ou changer le format d'un réglage existant, ou ajouter un élément par défaut à une liste (catégories…), impose une migration dans `src/02-settings-migrations.js` (incrémenter `SETTINGS_VERSION`, ajouter l'étape à `SETTINGS_MIGRATIONS`, idempotente) pour que les coffres déjà installés suivent. Ne jamais retirer `settingsVersion` de `trip-buddy.json`.
 - Le bouton *Mettre à jour* des réglages (`src/18-updater.js`) ne remplace que le dossier du module (sauf `data.json`) et les skills livrés de `.claude/skills` : tout nouveau fichier du module ou des skills doit rester dans ces dossiers ; ne jamais y ranger de données du voyage.
 - Le dépôt est **public** : ne jamais commiter de vraies données de voyage ni de données personnelles (le coffre d'exemple est fictif).
 

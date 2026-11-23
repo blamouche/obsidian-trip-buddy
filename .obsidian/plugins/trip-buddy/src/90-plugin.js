@@ -295,12 +295,29 @@ class TripBuddyPlugin extends Plugin {
 
   /* ------------------------------------------------------------ réglages */
   /** Réglages par défaut complétés par ceux enregistrés */
+  /** Réglages du fichier → réglages complets : migrations (settingsVersion), fusion avec les valeurs
+   *  par défaut, contrôle des types. Le compte rendu est dans this.settingsReport ({ changed, … }). */
   mergeSettings(saved) {
-    const out = U.deepMerge(JSON.parse(JSON.stringify(DEFAULT_SETTINGS)), saved || {});
+    const raw = SettingsMigration.isPlain(saved) ? SettingsMigration.clone(saved) : {};
+    const { from, to, done } = SettingsMigration.migrate(raw);
+    const out = U.deepMerge(SettingsMigration.clone(DEFAULT_SETTINGS), raw);
     delete out._info;
-    // thème retiré (Moleskine) : retour au thème par défaut
-    if (!['default', 'dark'].includes(out.display.theme)) out.display.theme = 'default';
+    const fixed = SettingsMigration.sanitize(out, DEFAULT_SETTINGS);
+    out.settingsVersion = to;
+    this.settingsReport = { from, to, migrated: done, fixed, changed: from !== to || done.length > 0 || fixed.length > 0 };
+    if (done.length) console.info(`[Trip Buddy] réglages migrés de la version ${from} à ${to} :`, done);
+    if (fixed.length) console.warn('[Trip Buddy] réglages corrigés (type inattendu) :', fixed);
     return out;
+  }
+
+  /** Après une migration ou une correction : réécrit trip-buddy.json et signale les valeurs corrigées */
+  async afterSettingsMerge() {
+    const r = this.settingsReport;
+    if (!r || !r.changed) return;
+    await this.persistSettings();
+    if (r.fixed.length) {
+      new Notice(`⚙️ Trip Buddy : réglage${r.fixed.length > 1 ? 's' : ''} au format inattendu corrigé${r.fixed.length > 1 ? 's' : ''} dans ${SETTINGS_FILE} : ${r.fixed.join(', ')}.`, 12000);
+    }
   }
 
   /** Lit trip-buddy.json ; renvoie { data } ou { error } (fichier absent : { missing: true }). */
@@ -322,6 +339,7 @@ class TripBuddyPlugin extends Plugin {
     if (res.data) {
       this.settings = this.mergeSettings(res.data);
       this.settingsText = res.text;
+      await this.afterSettingsMerge();
       return;
     }
     // premier lancement (ou fichier illisible) : réglages de data.json, la copie de secours
@@ -373,7 +391,8 @@ class TripBuddyPlugin extends Plugin {
     // même objet : les vues et modales qui le référencent voient les nouvelles valeurs
     Object.keys(this.settings).forEach((k) => delete this.settings[k]);
     Object.assign(this.settings, merged);
-    await this.saveData(this.settings);
+    if (this.settingsReport && this.settingsReport.changed) await this.afterSettingsMerge();
+    else await this.saveData(this.settings);
     this.applySettings();
     const tab = this.settingTab;
     if (tab && this.app.setting && this.app.setting.activeTab === tab) tab.display();

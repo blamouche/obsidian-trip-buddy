@@ -1,5 +1,6 @@
 {
   "_info": "Réglages du module Trip Buddy. Ce fichier peut être modifié à la main ou par un agent : Obsidian le recharge automatiquement. Garder un JSON valide. Détail des clés : README.md § Réglages.",
+  "settingsVersion": 1,
   "trip": {
     "name": "Kyoto sous les érables",
     "destination": "Kyoto, Japon",
