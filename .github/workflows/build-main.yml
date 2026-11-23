@@ -36,7 +36,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.NAME }}
-          path: dist/${{ env.NAME }}.zip
+          path: |
+            dist/*.zip
+            dist/*.json
           retention-days: 30
 
       - name: Publier la pré-version de développement
@@ -44,7 +46,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           TAG="dev-${GITHUB_RUN_NUMBER}"
-          gh release create "$TAG" "dist/$NAME.zip" \
+          gh release create "$TAG" dist/*.zip dist/*.json \
             --target "$GITHUB_SHA" \
             --prerelease \
             --title "Trip Buddy — développement ${NAME#trip-buddy-v}" \

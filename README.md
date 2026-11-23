@@ -28,7 +28,11 @@ Il rassemble dans un seul coffre : les lieux à voir (POI géocodés), une carte
 ## 🚀 Démarrage
 **Télécharger** : chaque version est publiée, prête à l'emploi, sur la page [Releases](https://github.com/blamouche/obsidian-trip-buddy/releases/latest) du dépôt. Téléchargez `trip-buddy-vX.Y.Z.zip`, décompressez-le, puis dans Obsidian choisissez *Ouvrir un dossier comme coffre* → dossier **Trip Buddy**. Les nouveautés de chaque version sont dans [[CHANGELOG]].
 
-**Mettre à jour** : le numéro de version et l'état des mises à jour sont affichés en haut de **Réglages → Trip Buddy** (✅ à jour, ou 🆕 version disponible avec les liens vers les nouveautés et le paquet). Pour passer à la nouvelle version, remplacez le dossier `.obsidian/plugins/trip-buddy` de votre coffre par celui du paquet, puis désactivez / réactivez Trip Buddy : vos notes et vos réglages (`trip-buddy.json`) sont conservés. Les skills se mettent à jour de la même façon (dossier `.claude/skills`).
+**Mettre à jour** : le numéro de version et l'état des mises à jour sont affichés en haut de **Réglages → Trip Buddy**. Quand une nouvelle version est publiée, le bouton **⬇️ Mettre à jour vers X.Y.Z** remplace, après confirmation :
+- le module Trip Buddy (`.obsidian/plugins/trip-buddy`, sauf `data.json`) ;
+- les skills IA livrés (`.claude/skills/travel-context` et `travel-planner`) — vos autres skills ne sont pas touchés.
+
+Les **contenus ne sont jamais modifiés** : notes, documents, journal, budget, valise, guide, `CONTEXT.md`, réglages (`trip-buddy.json`). Chaque fichier téléchargé est vérifié (taille et empreinte SHA-256) avant toute écriture ; la version en place est d'abord copiée dans la corbeille du coffre (`.trash/trip-buddy-<version>-<date>/`) et remise en place si l'écriture échoue. Le module se recharge tout seul à la fin. La mise à jour automatique est disponible à partir de la 1.2.0 ; pour une version plus ancienne, remplacez à la main le dossier `.obsidian/plugins/trip-buddy` (et `.claude/skills`) par ceux du paquet, puis désactivez / réactivez Trip Buddy.
 
 **Version de développement** : à chaque mise à jour de la branche `main`, un paquet `trip-buddy-vX.Y.Z-dev.N-<commit>.zip` est construit et publié en *pré-version* sur la page [Releases](https://github.com/blamouche/obsidian-trip-buddy/releases) (une seule à la fois). Il contient les nouveautés pas encore publiées : à réserver aux tests.
 
@@ -382,7 +386,7 @@ Services utilisés (tous sans clé d'API), uniquement à la demande :
 | Nominatim (OpenStreetMap) | Recherche d'adresses, adresse d'un point, emprise d'une ville |
 | Serveurs de tuiles (OSM, OSM France, OpenTopoMap, Esri, CyclOSM) | Fonds de carte, cartes hors ligne, cartes des PDF |
 | Overpass API | Téléchargement des réseaux de transports en commun |
-| GitHub (`api.github.com`) | Vérification d'une nouvelle version, à l'ouverture des réglages (au plus toutes les 6 h ; aucune donnée du voyage envoyée) |
+| GitHub (`api.github.com`, `github.com`) | Vérification d'une nouvelle version à l'ouverture des réglages (au plus toutes les 6 h) et téléchargement de la mise à jour quand vous cliquez *Mettre à jour* ; aucune donnée du voyage envoyée |
 | Google Maps / OpenStreetMap / votre service | Liens *Itinéraire*, *Ouvrir dans*, *Rechercher sur Google* (ouverts dans le navigateur) |
 
 Sans connexion : les notes, le programme, le budget, le journal, les traces GPX, les réseaux de transports déjà chargés et les zones de carte téléchargées restent disponibles.
@@ -397,6 +401,7 @@ Sans connexion : les notes, le programme, le budget, le journal, les traces GPX,
 | `10-data.js` | Couche de données : POI, programmes, journal, budget, valise |
 | `15-gpx.js` · `16-transit.js` · `17-offline.js` | Traces GPX · transports en commun · tuiles hors ligne |
 | `20-map.js` | Carte Leaflet et panneau de filtres |
+| `18-updater.js` | Mise à jour du module et des skills depuis GitHub (vérification, sauvegarde, installation, retour arrière) |
 | `30-modals.js` · `35-emoji.js` | Géocodage et fenêtres (lieu, dépense, programme, valise…) · sélecteur d'emoji et couleurs d'un emoji (`emojiPalette`, dégradé de l'en-tête) |
 | `40-blocks-poi.js` · `41-programme.js` · `42-budget.js` · `43-modules.js` | Blocs `tripbuddy-*` |
 | `44-journal-quickadd.js` · `45-guide.js` | Saisie rapide en mode lecture · guide |
@@ -422,6 +427,7 @@ sh .github/scripts/release.sh 1.1.0
   Le script transforme *Non publié* en section `[1.1.0]` datée, met le numéro à jour (manifest et ce mode d'emploi), reconstruit le module, vérifie le paquet, commite « Version 1.1.0 », pose le tag `v1.1.0` et pousse. Le tag déclenche l'action GitHub *Release* (`.github/workflows/release.yml`) qui publie `trip-buddy-v1.1.0.zip` — le coffre complet, CHANGELOG compris — avec la section du CHANGELOG comme notes de version.
 - **Paquet de développement automatique** : à chaque push sur `main`, l'action *Paquet de développement* (`.github/workflows/build-main.yml`) construit `trip-buddy-vX.Y.Z-dev.N-<commit>.zip` (X.Y.Z = dernière version publiée, N = numéro du build), le garde 30 jours comme artefact du build et le publie en pré-version `dev-N`, en supprimant la précédente. Ses notes reprennent la section *Non publié* du CHANGELOG. La dernière version stable (`releases/latest`) et la vérification des mises à jour ne sont pas concernées.
 - Tester le paquet en local sans rien publier : `sh .github/scripts/package.sh <version actuelle> dist` (le dossier `dist/` est ignoré par git).
+- Chaque version publie aussi `trip-buddy-update-vX.Y.Z.json` : le module et les skills seulement (chemins `plugin/…` et `skills/…`, contenu en base64, taille et SHA-256 par fichier). C'est ce fichier qu'utilise le bouton *Mettre à jour* des réglages (`src/18-updater.js`).
 - Le paquet contient les fichiers suivis par git, sauf l'outillage du dépôt (`.github`, `.gitignore`, `.gitattributes`) : jamais `.trash`, l'état des fenêtres ni les réglages de synchronisation.
 
 ## 📜 Licence

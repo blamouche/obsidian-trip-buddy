@@ -397,15 +397,43 @@ class TripBuddyPlugin extends Plugin {
       const latest = String(j.tag_name || '').replace(/^v/, '');
       if (!latest) throw new Error('réponse inattendue');
       const asset = (j.assets || []).find((a) => /\.zip$/i.test(a.name));
+      const bundle = (j.assets || []).find((a) => /^trip-buddy-update.*\.json$/i.test(a.name));
       res = {
         ok: true, current, latest, newer: U.semverCmp(latest, current) > 0,
-        url: j.html_url || `${REPO_URL}/releases/latest`, download: asset ? asset.browser_download_url : null, date: j.published_at || '',
+        url: j.html_url || `${REPO_URL}/releases/latest`, download: asset ? asset.browser_download_url : null,
+        bundle: bundle ? bundle.browser_download_url : null, date: j.published_at || '',
       };
     } catch (e) {
       res = { ok: false, current, error: (e && e.message) || String(e) };
     }
     res.at = now;
     this.updateInfo = res;
+    return res;
+  }
+
+  /** Met à jour le module et les skills IA vers la version `info.latest` (résultat de checkUpdate),
+   *  puis recharge le module. Les notes et les réglages ne sont pas touchés (voir TBUpdater). */
+  async installUpdate(info) {
+    if (!info || !info.bundle) throw new Error('pas de paquet de mise à jour pour cette version');
+    const r = await requestUrl({ url: info.bundle, throw: false });
+    if (r.status !== 200) throw new Error(`téléchargement impossible (GitHub a répondu ${r.status})`);
+    const up = new TBUpdater(this.app.vault.adapter, this.manifest.dir);
+    const res = await up.install(r.json, { expectedVersion: info.latest, currentVersion: this.manifest.version });
+    this.updateInfo = null;
+    new Notice(`✅ Trip Buddy mis à jour en ${info.latest} (${res.written} fichiers). Ancienne version copiée dans ${res.backup}. Rechargement du module…`, 10000);
+    // rechargement : le module se désactive puis se réactive avec le nouveau code
+    const id = this.manifest.id;
+    const app = this.app;
+    setTimeout(async () => {
+      try {
+        await app.plugins.disablePlugin(id);
+        await app.plugins.enablePlugin(id);
+        if (app.setting && app.setting.containerEl && app.setting.containerEl.isConnected) app.setting.openTabById(id);
+      } catch (e) {
+        console.error('[Trip Buddy] rechargement', e);
+        new Notice('Désactivez puis réactivez Trip Buddy (Réglages → Plugins communautaires) pour terminer la mise à jour.', 0);
+      }
+    }, 400);
     return res;
   }
 

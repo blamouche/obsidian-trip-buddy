@@ -30,12 +30,18 @@ class TripBuddySettingTab extends PluginSettingTab {
         st.addClass('is-new');
         st.appendText(`🆕 Version ${u.latest} disponible`);
         const links = box.createDiv('tb-set-update-links');
+        if (u.bundle) {
+          const go = links.createEl('button', { cls: 'mod-cta tb-btn-sm', text: `⬇️ Mettre à jour vers ${u.latest}` });
+          go.addEventListener('click', (e) => { e.preventDefault(); this.confirmUpdate(u, go); });
+        }
         links.createEl('a', { text: 'Voir les nouveautés', href: u.url });
-        if (u.download) links.createEl('a', { text: 'Télécharger le paquet', href: u.download });
         links.createDiv({
           cls: 'setting-item-description',
-          text: 'Pour mettre à jour : remplacez le dossier .obsidian/plugins/trip-buddy de ce coffre par celui du paquet, puis désactivez / réactivez Trip Buddy. Vos notes et vos réglages (trip-buddy.json) sont conservés.',
+          text: u.bundle
+            ? 'Met à jour le module Trip Buddy et les skills IA (.claude/skills). Vos notes, documents, journal, budget et réglages ne sont pas modifiés.'
+            : 'Cette version ne propose pas de mise à jour automatique : remplacez le dossier .obsidian/plugins/trip-buddy de ce coffre par celui du paquet, puis désactivez / réactivez Trip Buddy. Vos notes et vos réglages sont conservés.',
         });
+        if (!u.bundle && u.download) links.createEl('a', { text: 'Télécharger le paquet', href: u.download });
       } else {
         st.setText('✅ À jour');
         st.addClass('is-ok');
@@ -46,6 +52,27 @@ class TripBuddySettingTab extends PluginSettingTab {
     };
     render(null, true);
     this.plugin.checkUpdate(false).then((u) => { if (box.isConnected) render(u); });
+  }
+
+  /** Confirmation puis mise à jour du module et des skills */
+  confirmUpdate(u, btn) {
+    new ConfirmModal(this.plugin, `⬇️ Mettre à jour Trip Buddy en ${u.latest} ?`,
+      `La mise à jour remplace le module Trip Buddy (${this.plugin.manifest.dir}) et les skills IA livrés (.claude/skills/travel-context, travel-planner) par ceux de la version ${u.latest}. `
+      + 'Vos notes, documents, journal, budget, valise, guide, CONTEXT.md et réglages (trip-buddy.json) ne sont pas modifiés. '
+      + `La version actuelle (${this.plugin.manifest.version}) est copiée dans la corbeille du coffre (.trash) avant d’être remplacée. Le module se recharge à la fin.`,
+      'Mettre à jour', async () => {
+        btn.disabled = true;
+        btn.setText('Mise à jour en cours…');
+        try {
+          await this.plugin.installUpdate(u);
+          btn.setText('✅ Mis à jour');
+        } catch (e) {
+          console.error('[Trip Buddy] mise à jour', e);
+          new Notice(`⚠️ Mise à jour impossible : ${(e && e.message) || e}`, 10000);
+          btn.disabled = false;
+          btn.setText(`⬇️ Mettre à jour vers ${u.latest}`);
+        }
+      }).open();
   }
 
   /** Titre de section ; `id` permet d'y accéder directement (plugin.openSettings(id)) */
