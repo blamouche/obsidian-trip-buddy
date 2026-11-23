@@ -8,6 +8,8 @@ Chaque version publiée est disponible en téléchargement, prête à ouvrir dan
 
 ## [Non publié]
 
+## [1.2.0] - 2026-11-23
+
 ### Ajouté
 - Réglages : bouton **Mettre à jour vers X.Y.Z** quand une nouvelle version est publiée. Met à jour le module et les skills IA livrés, sans toucher aux notes ni aux réglages ; chaque fichier est vérifié (SHA-256), l'ancienne version est copiée dans `.trash` et remise en place en cas d'échec, puis le module se recharge.
 - Chaque version publie un paquet de mise à jour `trip-buddy-update-vX.Y.Z.json` (module + skills).
