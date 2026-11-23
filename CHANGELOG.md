@@ -8,6 +8,8 @@ Chaque version publiée est disponible en téléchargement, prête à ouvrir dan
 
 ## [Non publié]
 
+## [1.2.8] - 2026-11-23
+
 ### Corrigé
 - Mise à jour depuis le panneau ou les réglages : la dernière version est revérifiée au moment du clic. Auparavant, le résultat en cache (jusqu'à 6 h) pouvait faire installer une version déjà dépassée, et le panneau réapparaissait aussitôt pour la suivante.
 - Vérification des mises à jour : une seule requête à GitHub à la fois ; les menus affichés en même temps au démarrage attendent la même réponse au lieu d'envoyer chacun la leur.
