@@ -8,6 +8,8 @@ Chaque version publiée est disponible en téléchargement, prête à ouvrir dan
 
 ## [Non publié]
 
+## [1.2.6] - 2026-11-23
+
 ### Modifié
 - Version de test du panneau « nouvelle version disponible » et de la mise à jour depuis Obsidian : aucun changement fonctionnel.
 
