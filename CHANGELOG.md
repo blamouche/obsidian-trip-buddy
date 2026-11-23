@@ -8,6 +8,8 @@ Chaque version publiée est disponible en téléchargement, prête à ouvrir dan
 
 ## [Non publié]
 
+## [1.4.0] - 2026-11-23
+
 ### Ajouté
 - **Aide visuelle** : bouton 💡 à côté du choix du thème sur l'accueil (et commande *Afficher / masquer l'aide visuelle*). Activée, elle affiche de petites aides d'une ligne à côté de chaque zone des pages (en-tête, tuiles, carte, catégories, budget, actions…) : ce qui s'y règle, avec un lien direct vers la bonne section des réglages, et les options de chaque bloc.
 - Chaque section des réglages a une ancre : un lien peut ouvrir les réglages directement sur elle.
