@@ -32,7 +32,41 @@ class NavBlock extends TBBlock {
       a.createSpan({ cls: 'tb-nav-lbl', text: label });
       a.addEventListener('click', (e) => { e.preventDefault(); this.plugin.openPath(path, e.ctrlKey || e.metaKey); });
     });
+    this.updateBanner();
   }
+
+  /** Panneau « nouvelle version disponible » au-dessus du menu (vérification GitHub en cache 6 h) */
+  async updateBanner() {
+    const token = (this.bannerToken = (this.bannerToken || 0) + 1);
+    if (this.banner) { this.banner.remove(); this.banner = null; }
+    if (this.s.display && this.s.display.updateBanner === false) return;
+    const u = await this.plugin.checkUpdate(false);
+    if (token !== this.bannerToken || !this.root.isConnected) return;
+    if (!u || !u.ok || !u.newer || U.storeGet('updateDismissed', '') === u.latest) return;
+
+    const b = createDiv({ cls: 'tb tb-update-banner' });
+    this.el.insertBefore(b, this.root);
+    this.banner = b;
+    b.createDiv({ cls: 'tb-update-banner-ico', text: '🆕' });
+    const txt = b.createDiv('tb-update-banner-txt');
+    txt.createDiv({ cls: 'tb-update-banner-title', text: `Trip Buddy ${u.latest} est disponible` });
+    txt.createDiv({ cls: 'tb-update-banner-sub', text: `Vous utilisez la version ${u.current}. La mise à jour concerne le module et les skills IA : vos notes et réglages ne changent pas.` });
+    const act = b.createDiv('tb-update-banner-actions');
+    if (u.bundle) {
+      const go = act.createEl('button', { cls: 'mod-cta tb-btn-sm', text: '⬇️ Mettre à jour' });
+      go.addEventListener('click', (e) => { e.preventDefault(); this.plugin.confirmUpdate(u, go); });
+    } else {
+      U.button(act, '⚙️ Comment mettre à jour', 'tb-btn-sm', () => this.plugin.openSettings());
+    }
+    const news = act.createEl('a', { cls: 'tb-update-banner-link', text: 'Nouveautés', href: u.url });
+    news.setAttr('target', '_blank');
+    U.button(act, '✕', 'tb-btn-icon tb-btn-sm tb-update-banner-close', () => {
+      U.storeSet('updateDismissed', u.latest);
+      this.plugin.refreshAll();
+    }, `Masquer jusqu’à la prochaine version`);
+  }
+
+  destroy() { if (this.banner) this.banner.remove(); }
   relevant() { return false; }
 }
 

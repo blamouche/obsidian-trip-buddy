@@ -28,7 +28,7 @@ Il rassemble dans un seul coffre : les lieux à voir (POI géocodés), une carte
 ## 🚀 Démarrage
 **Télécharger** : chaque version est publiée, prête à l'emploi, sur la page [Releases](https://github.com/blamouche/obsidian-trip-buddy/releases/latest) du dépôt. Téléchargez `trip-buddy-vX.Y.Z.zip`, décompressez-le, puis dans Obsidian choisissez *Ouvrir un dossier comme coffre* → dossier **Trip Buddy**. Les nouveautés de chaque version sont dans [[CHANGELOG]].
 
-**Mettre à jour** : le numéro de version et l'état des mises à jour sont affichés en haut de **Réglages → Trip Buddy**. Quand une nouvelle version est publiée, le bouton **⬇️ Mettre à jour vers X.Y.Z** remplace, après confirmation :
+**Mettre à jour** : quand une nouvelle version est publiée, un **panneau 🆕 au-dessus du menu principal** l'annonce sur toutes les pages (bouton **⬇️ Mettre à jour**, lien *Nouveautés*, ✕ pour le masquer jusqu'à la version suivante ; désactivable dans *Réglages → Affichage des notes*). Le numéro de version et l'état des mises à jour sont aussi affichés en haut de **Réglages → Trip Buddy**. La mise à jour remplace, après confirmation :
 - le module Trip Buddy (`.obsidian/plugins/trip-buddy`, sauf `data.json`) ;
 - les skills IA livrés (`.claude/skills/travel-context` et `travel-planner`) — vos autres skills ne sont pas touchés.
 
@@ -343,7 +343,7 @@ Toutes les modifications s'appliquent immédiatement à toutes les pages. Les r�
 | 🧭 **Itinéraire et « Ouvrir dans »** | Service pour les boutons *Itinéraire / Y aller* et *Ouvrir dans* : OpenStreetMap, Google Maps (à pied), ou un fournisseur personnalisé avec ses URL. Variables : `{lat}` `{lon}` `{name}` `{address}` `{query}`. Exemple Apple Plans : `https://maps.apple.com/?daddr={lat},{lon}&dirflg=w`. |
 | 🧭 **Menu principal** | Ordre des rubriques de la barre de navigation (↑ ↓, ↺ ordre par défaut) et rubriques affichées (👁 / 🙈 par rubrique, 👁 tout afficher). Une rubrique masquée disparaît seulement du menu : ses pages restent accessibles. Au moins une rubrique reste affichée. |
 | 📂 **Dossiers et pages** | Dossiers (documents, journal, POI, programmes, modèles), pages (accueil, programme, carte, index des POI, journal, budget, valise, documents) et modèles (POI, journal, programme). |
-| 🧾 **Affichage des notes** | Thème (*Par défaut* qui suit Obsidian, ou *Sombre*) ; style des pictogrammes (*Traits* : icônes fines monochromes, ou *Emoji*) ; masquer les propriétés ; masquer le titre en haut des notes ; saisie rapide ; largeur des pages du voyage (standard, large 1 180 px, pleine largeur) ; ouvrir les notes en mode lecture ; dossier des images et fichiers collés. Ces options sont gérées par le module et réappliquées à chaque démarrage, même si la configuration d'Obsidian est réinitialisée (synchronisation…). |
+| 🧾 **Affichage des notes** | Thème (*Par défaut* qui suit Obsidian, ou *Sombre*) ; style des pictogrammes (*Traits* : icônes fines monochromes, ou *Emoji*) ; panneau des mises à jour au-dessus du menu (activé par défaut) ; masquer les propriétés ; masquer le titre en haut des notes ; saisie rapide ; largeur des pages du voyage (standard, large 1 180 px, pleine largeur) ; ouvrir les notes en mode lecture ; dossier des images et fichiers collés. Ces options sont gérées par le module et réappliquées à chaque démarrage, même si la configuration d'Obsidian est réinitialisée (synchronisation…). |
 | ↔️ **Colonnes latérales** | Repli automatique des colonnes inactives (jamais pendant le survol ou la saisie), délai d'inactivité (secondes, minimum 2), colonnes concernées (gauche, droite ou les deux). |
 | 🏠 **Démarrage** | Ouvrir l'accueil à l'ouverture d'Obsidian ; rouvrir l'accueil quand tous les onglets sont fermés. |
 | 📥 **Cartes hors ligne** | Voir [[#📥 Cartes hors ligne|Cartes hors ligne]]. |
@@ -386,7 +386,7 @@ Services utilisés (tous sans clé d'API), uniquement à la demande :
 | Nominatim (OpenStreetMap) | Recherche d'adresses, adresse d'un point, emprise d'une ville |
 | Serveurs de tuiles (OSM, OSM France, OpenTopoMap, Esri, CyclOSM) | Fonds de carte, cartes hors ligne, cartes des PDF |
 | Overpass API | Téléchargement des réseaux de transports en commun |
-| GitHub (`api.github.com`, `github.com`) | Vérification d'une nouvelle version à l'ouverture des réglages (au plus toutes les 6 h) et téléchargement de la mise à jour quand vous cliquez *Mettre à jour* ; aucune donnée du voyage envoyée |
+| GitHub (`api.github.com`, `github.com`) | Vérification d'une nouvelle version à l'affichage du menu ou des réglages (au plus toutes les 6 h) et téléchargement de la mise à jour quand vous cliquez *Mettre à jour* ; aucune donnée du voyage envoyée |
 | Google Maps / OpenStreetMap / votre service | Liens *Itinéraire*, *Ouvrir dans*, *Rechercher sur Google* (ouverts dans le navigateur) |
 
 Sans connexion : les notes, le programme, le budget, le journal, les traces GPX, les réseaux de transports déjà chargés et les zones de carte téléchargées restent disponibles.

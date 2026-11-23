@@ -32,7 +32,7 @@ class TripBuddySettingTab extends PluginSettingTab {
         const links = box.createDiv('tb-set-update-links');
         if (u.bundle) {
           const go = links.createEl('button', { cls: 'mod-cta tb-btn-sm', text: `⬇️ Mettre à jour vers ${u.latest}` });
-          go.addEventListener('click', (e) => { e.preventDefault(); this.confirmUpdate(u, go); });
+          go.addEventListener('click', (e) => { e.preventDefault(); this.plugin.confirmUpdate(u, go); });
         }
         links.createEl('a', { text: 'Voir les nouveautés', href: u.url });
         links.createDiv({
@@ -63,27 +63,6 @@ class TripBuddySettingTab extends PluginSettingTab {
     };
     link('🐙 Dépôt GitHub', REPO_URL, `Code source, documentation et suivi du projet (${REPO})`);
     link('🏷️ Dernière version', `${REPO_URL}/releases/latest`, 'Notes de version et paquet téléchargeable de la dernière version publiée');
-  }
-
-  /** Confirmation puis mise à jour du module et des skills */
-  confirmUpdate(u, btn) {
-    new ConfirmModal(this.plugin, `⬇️ Mettre à jour Trip Buddy en ${u.latest} ?`,
-      `La mise à jour remplace le module Trip Buddy (${this.plugin.manifest.dir}) et les skills IA livrés (.claude/skills/travel-context, travel-planner) par ceux de la version ${u.latest}. `
-      + 'Vos notes, documents, journal, budget, valise, guide, CONTEXT.md et réglages (trip-buddy.json) ne sont pas modifiés. '
-      + `La version actuelle (${this.plugin.manifest.version}) est copiée dans la corbeille du coffre (.trash) avant d’être remplacée. Le module se recharge à la fin.`,
-      'Mettre à jour', async () => {
-        btn.disabled = true;
-        btn.setText('Mise à jour en cours…');
-        try {
-          await this.plugin.installUpdate(u);
-          btn.setText('✅ Mis à jour');
-        } catch (e) {
-          console.error('[Trip Buddy] mise à jour', e);
-          new Notice(`⚠️ Mise à jour impossible : ${(e && e.message) || e}`, 10000);
-          btn.disabled = false;
-          btn.setText(`⬇️ Mettre à jour vers ${u.latest}`);
-        }
-      }).open();
   }
 
   /** Titre de section ; `id` permet d'y accéder directement (plugin.openSettings(id)) */
@@ -259,6 +238,9 @@ class TripBuddySettingTab extends PluginSettingTab {
     new Setting(c).setName('Saisie rapide (journal, accueil, programmes, idées, « Mes notes » des lieux)')
       .setDesc('En mode lecture, affiche une zone de texte sous chaque section des entrées de journal, des « Notes rapides » de l’accueil et de la section « Mes notes » des fiches de lieux, pour ajouter, modifier ou supprimer du texte et des photos sans passer en mode édition. Dans les fiches de lieux, tout le texte se modifie ou se supprime ; l’ajout se fait dans « Mes notes ».')
       .addToggle((t) => t.setValue(!!disp.journalQuickAdd).onChange((v) => { disp.journalQuickAdd = v; this.save(); }));
+    new Setting(c).setName('Signaler les mises à jour au-dessus du menu')
+      .setDesc('Quand une nouvelle version de Trip Buddy est publiée, affiche un panneau au-dessus du menu principal, avec un bouton pour mettre à jour. Vérification sur GitHub au plus toutes les 6 heures.')
+      .addToggle((t) => t.setValue(disp.updateBanner !== false).onChange((v) => { disp.updateBanner = v; this.save(); }));
     new Setting(c).setName('Largeur des pages du voyage')
       .setDesc('Appliquée à toutes les pages du voyage (accueil, lieux, journal, programme, budget, valise…), en lecture comme en édition.')
       .addDropdown((d) => d.addOption('normal', 'Standard (largeur de lecture Obsidian)').addOption('wide', 'Large (1 180 px)').addOption('full', 'Pleine largeur')

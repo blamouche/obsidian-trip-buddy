@@ -210,6 +210,7 @@ const DEFAULT_SETTINGS = {
   display: {
     hideProperties: true, // masque le bloc « Propriétés » en tête des notes
     hideInlineTitle: false, // masque le titre affiché en haut des notes
+    updateBanner: true, // panneau « nouvelle version » au-dessus du menu principal
     journalQuickAdd: true, // zone de saisie sous chaque section du journal (mode lecture)
     pageWidth: 'wide', // largeur des pages du voyage : normal | wide | full
     theme: 'default', // thème des pages du voyage : default | dark
@@ -528,7 +529,7 @@ const ICONS = {
   '📋': 'clipboard-list|clipboard', '🗑️': 'trash-2', '🗑': 'trash-2', '📷': 'camera', '📸': 'camera', '✍️': 'pen-line|pencil',
   '💸': 'receipt', '🧾': 'receipt', '⛶': 'maximize', '✨': 'sparkles', '🔁': 'repeat', '📄': 'file-text', '📃': 'file',
   '📝': 'notebook-pen|file-pen-line|pencil', '📎': 'paperclip', '📌': 'map-pin-plus|map-pin', '＋': 'plus', '↺': 'rotate-ccw',
-  '🐙': 'github|git-branch', '🏷️': 'tag',
+  '🐙': 'github|git-branch', '🏷️': 'tag', '🆕': 'sparkles',
   '🙈': 'eye-off', '👁': 'eye', '⬆️': 'upload', '📥': 'cloud-download|download-cloud|download', '💾': 'save', '🎉': 'party-popper|sparkles', '⏳': 'hourglass|loader',
   '⚠️': 'triangle-alert|alert-triangle', '⚠︎': 'triangle-alert|alert-triangle', '💡': 'lightbulb', '📖': 'book-open',
   '⏱️': 'clock', '🎟️': 'ticket', '🚗': 'car', '🧳': 'luggage|briefcase', '✅': 'circle-check|check-circle-2',
@@ -5328,7 +5329,41 @@ class NavBlock extends TBBlock {
       a.createSpan({ cls: 'tb-nav-lbl', text: label });
       a.addEventListener('click', (e) => { e.preventDefault(); this.plugin.openPath(path, e.ctrlKey || e.metaKey); });
     });
+    this.updateBanner();
   }
+
+  /** Panneau « nouvelle version disponible » au-dessus du menu (vérification GitHub en cache 6 h) */
+  async updateBanner() {
+    const token = (this.bannerToken = (this.bannerToken || 0) + 1);
+    if (this.banner) { this.banner.remove(); this.banner = null; }
+    if (this.s.display && this.s.display.updateBanner === false) return;
+    const u = await this.plugin.checkUpdate(false);
+    if (token !== this.bannerToken || !this.root.isConnected) return;
+    if (!u || !u.ok || !u.newer || U.storeGet('updateDismissed', '') === u.latest) return;
+
+    const b = createDiv({ cls: 'tb tb-update-banner' });
+    this.el.insertBefore(b, this.root);
+    this.banner = b;
+    b.createDiv({ cls: 'tb-update-banner-ico', text: '🆕' });
+    const txt = b.createDiv('tb-update-banner-txt');
+    txt.createDiv({ cls: 'tb-update-banner-title', text: `Trip Buddy ${u.latest} est disponible` });
+    txt.createDiv({ cls: 'tb-update-banner-sub', text: `Vous utilisez la version ${u.current}. La mise à jour concerne le module et les skills IA : vos notes et réglages ne changent pas.` });
+    const act = b.createDiv('tb-update-banner-actions');
+    if (u.bundle) {
+      const go = act.createEl('button', { cls: 'mod-cta tb-btn-sm', text: '⬇️ Mettre à jour' });
+      go.addEventListener('click', (e) => { e.preventDefault(); this.plugin.confirmUpdate(u, go); });
+    } else {
+      U.button(act, '⚙️ Comment mettre à jour', 'tb-btn-sm', () => this.plugin.openSettings());
+    }
+    const news = act.createEl('a', { cls: 'tb-update-banner-link', text: 'Nouveautés', href: u.url });
+    news.setAttr('target', '_blank');
+    U.button(act, '✕', 'tb-btn-icon tb-btn-sm tb-update-banner-close', () => {
+      U.storeSet('updateDismissed', u.latest);
+      this.plugin.refreshAll();
+    }, `Masquer jusqu’à la prochaine version`);
+  }
+
+  destroy() { if (this.banner) this.banner.remove(); }
   relevant() { return false; }
 }
 
@@ -9165,7 +9200,7 @@ class TripBuddySettingTab extends PluginSettingTab {
         const links = box.createDiv('tb-set-update-links');
         if (u.bundle) {
           const go = links.createEl('button', { cls: 'mod-cta tb-btn-sm', text: `⬇️ Mettre à jour vers ${u.latest}` });
-          go.addEventListener('click', (e) => { e.preventDefault(); this.confirmUpdate(u, go); });
+          go.addEventListener('click', (e) => { e.preventDefault(); this.plugin.confirmUpdate(u, go); });
         }
         links.createEl('a', { text: 'Voir les nouveautés', href: u.url });
         links.createDiv({
@@ -9196,27 +9231,6 @@ class TripBuddySettingTab extends PluginSettingTab {
     };
     link('🐙 Dépôt GitHub', REPO_URL, `Code source, documentation et suivi du projet (${REPO})`);
     link('🏷️ Dernière version', `${REPO_URL}/releases/latest`, 'Notes de version et paquet téléchargeable de la dernière version publiée');
-  }
-
-  /** Confirmation puis mise à jour du module et des skills */
-  confirmUpdate(u, btn) {
-    new ConfirmModal(this.plugin, `⬇️ Mettre à jour Trip Buddy en ${u.latest} ?`,
-      `La mise à jour remplace le module Trip Buddy (${this.plugin.manifest.dir}) et les skills IA livrés (.claude/skills/travel-context, travel-planner) par ceux de la version ${u.latest}. `
-      + 'Vos notes, documents, journal, budget, valise, guide, CONTEXT.md et réglages (trip-buddy.json) ne sont pas modifiés. '
-      + `La version actuelle (${this.plugin.manifest.version}) est copiée dans la corbeille du coffre (.trash) avant d’être remplacée. Le module se recharge à la fin.`,
-      'Mettre à jour', async () => {
-        btn.disabled = true;
-        btn.setText('Mise à jour en cours…');
-        try {
-          await this.plugin.installUpdate(u);
-          btn.setText('✅ Mis à jour');
-        } catch (e) {
-          console.error('[Trip Buddy] mise à jour', e);
-          new Notice(`⚠️ Mise à jour impossible : ${(e && e.message) || e}`, 10000);
-          btn.disabled = false;
-          btn.setText(`⬇️ Mettre à jour vers ${u.latest}`);
-        }
-      }).open();
   }
 
   /** Titre de section ; `id` permet d'y accéder directement (plugin.openSettings(id)) */
@@ -9392,6 +9406,9 @@ class TripBuddySettingTab extends PluginSettingTab {
     new Setting(c).setName('Saisie rapide (journal, accueil, programmes, idées, « Mes notes » des lieux)')
       .setDesc('En mode lecture, affiche une zone de texte sous chaque section des entrées de journal, des « Notes rapides » de l’accueil et de la section « Mes notes » des fiches de lieux, pour ajouter, modifier ou supprimer du texte et des photos sans passer en mode édition. Dans les fiches de lieux, tout le texte se modifie ou se supprime ; l’ajout se fait dans « Mes notes ».')
       .addToggle((t) => t.setValue(!!disp.journalQuickAdd).onChange((v) => { disp.journalQuickAdd = v; this.save(); }));
+    new Setting(c).setName('Signaler les mises à jour au-dessus du menu')
+      .setDesc('Quand une nouvelle version de Trip Buddy est publiée, affiche un panneau au-dessus du menu principal, avec un bouton pour mettre à jour. Vérification sur GitHub au plus toutes les 6 heures.')
+      .addToggle((t) => t.setValue(disp.updateBanner !== false).onChange((v) => { disp.updateBanner = v; this.save(); }));
     new Setting(c).setName('Largeur des pages du voyage')
       .setDesc('Appliquée à toutes les pages du voyage (accueil, lieux, journal, programme, budget, valise…), en lecture comme en édition.')
       .addDropdown((d) => d.addOption('normal', 'Standard (largeur de lecture Obsidian)').addOption('wide', 'Large (1 180 px)').addOption('full', 'Pleine largeur')
@@ -10406,6 +10423,26 @@ class TripBuddyPlugin extends Plugin {
     } catch (e) {
       console.error('[Trip Buddy] manifest.json', e);
     }
+  }
+
+  /** Confirmation puis mise à jour du module et des skills (réglages et panneau au-dessus du menu) */
+  confirmUpdate(u, btn) {
+    const label = btn ? btn.textContent : '';
+    new ConfirmModal(this, `⬇️ Mettre à jour Trip Buddy en ${u.latest} ?`,
+      `La mise à jour remplace le module Trip Buddy (${this.manifest.dir}) et les skills IA livrés (.claude/skills/travel-context, travel-planner) par ceux de la version ${u.latest}. `
+      + 'Vos notes, documents, journal, budget, valise, guide, CONTEXT.md et réglages (trip-buddy.json) ne sont pas modifiés. '
+      + `La version actuelle (${this.manifest.version}) est copiée dans la corbeille du coffre (.trash) avant d’être remplacée. Le module se recharge à la fin.`,
+      'Mettre à jour', async () => {
+        if (btn) { btn.disabled = true; btn.setText('Mise à jour en cours…'); }
+        try {
+          await this.installUpdate(u);
+          if (btn) btn.setText('✅ Mis à jour');
+        } catch (e) {
+          console.error('[Trip Buddy] mise à jour', e);
+          new Notice(`⚠️ Mise à jour impossible : ${(e && e.message) || e}`, 10000);
+          if (btn) { btn.disabled = false; btn.setText(label); }
+        }
+      }).open();
   }
 
   /** Met à jour le module et les skills IA vers la version `info.latest` (résultat de checkUpdate),

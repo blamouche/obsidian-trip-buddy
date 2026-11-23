@@ -8,6 +8,9 @@ Chaque version publiée est disponible en téléchargement, prête à ouvrir dan
 
 ## [Non publié]
 
+### Ajouté
+- Panneau « nouvelle version disponible » au-dessus du menu principal, avec un bouton pour mettre à jour, un lien vers les nouveautés et ✕ pour le masquer jusqu'à la version suivante (désactivable dans *Affichage des notes*).
+
 ## [1.2.4] - 2026-11-23
 
 ### Corrigé

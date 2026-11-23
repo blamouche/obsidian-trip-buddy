@@ -447,6 +447,26 @@ class TripBuddyPlugin extends Plugin {
     }
   }
 
+  /** Confirmation puis mise à jour du module et des skills (réglages et panneau au-dessus du menu) */
+  confirmUpdate(u, btn) {
+    const label = btn ? btn.textContent : '';
+    new ConfirmModal(this, `⬇️ Mettre à jour Trip Buddy en ${u.latest} ?`,
+      `La mise à jour remplace le module Trip Buddy (${this.manifest.dir}) et les skills IA livrés (.claude/skills/travel-context, travel-planner) par ceux de la version ${u.latest}. `
+      + 'Vos notes, documents, journal, budget, valise, guide, CONTEXT.md et réglages (trip-buddy.json) ne sont pas modifiés. '
+      + `La version actuelle (${this.manifest.version}) est copiée dans la corbeille du coffre (.trash) avant d’être remplacée. Le module se recharge à la fin.`,
+      'Mettre à jour', async () => {
+        if (btn) { btn.disabled = true; btn.setText('Mise à jour en cours…'); }
+        try {
+          await this.installUpdate(u);
+          if (btn) btn.setText('✅ Mis à jour');
+        } catch (e) {
+          console.error('[Trip Buddy] mise à jour', e);
+          new Notice(`⚠️ Mise à jour impossible : ${(e && e.message) || e}`, 10000);
+          if (btn) { btn.disabled = false; btn.setText(label); }
+        }
+      }).open();
+  }
+
   /** Met à jour le module et les skills IA vers la version `info.latest` (résultat de checkUpdate),
    *  puis recharge le module. Les notes et les réglages ne sont pas touchés (voir TBUpdater). */
   async installUpdate(info) {
