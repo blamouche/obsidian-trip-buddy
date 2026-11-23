@@ -8,6 +8,8 @@ Chaque version publiée est disponible en téléchargement, prête à ouvrir dan
 
 ## [Non publié]
 
+## [1.2.3] - 2026-11-23
+
 ### Corrigé
 - Mise à jour depuis les réglages : la fenêtre des réglages restait blanche après le rechargement du module. Le module rechargé rouvre désormais son onglet de réglages.
 

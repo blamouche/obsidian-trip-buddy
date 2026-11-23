@@ -1,6 +1,6 @@
 # 🧭 Mode d'emploi de Trip Buddy
 
-Ce coffre est un **modèle de voyage** : dupliquez-le pour chaque nouveau voyage. Tout est piloté par le module **Trip Buddy** (plugin inclus dans `.obsidian/plugins/trip-buddy`, version 1.2.2, Obsidian 1.4 ou plus récent, bureau **et** mobile).
+Ce coffre est un **modèle de voyage** : dupliquez-le pour chaque nouveau voyage. Tout est piloté par le module **Trip Buddy** (plugin inclus dans `.obsidian/plugins/trip-buddy`, version 1.2.3, Obsidian 1.4 ou plus récent, bureau **et** mobile).
 
 Il rassemble dans un seul coffre : les lieux à voir (POI géocodés), une carte OpenStreetMap, le programme jour par jour, le journal, le budget partagé, la valise, les documents, un guide de la destination, et produit deux PDF : un **carnet souvenir** imprimable et un **export complet** du voyage.
 
