@@ -10053,6 +10053,7 @@ const CODE_BLOCKS = {
 
 class TripBuddyPlugin extends Plugin {
   async onload() {
+    await this.syncManifest();
     await this.loadSettings();
     this.data = new TripData(this);
     TBOffline.init(this);
@@ -10372,6 +10373,21 @@ class TripBuddyPlugin extends Plugin {
     return res;
   }
 
+  /** Après une mise à jour, Obsidian peut garder en mémoire l'ancien manifest.json (lu à son démarrage) :
+   *  on relit celui du disque pour que le numéro de version affiché soit celui du code chargé. */
+  async syncManifest() {
+    try {
+      const dir = this.manifest.dir;
+      const fresh = JSON.parse(await this.app.vault.adapter.read(`${dir}/manifest.json`));
+      if (!fresh || !fresh.version || fresh.version === this.manifest.version) return;
+      Object.assign(this.manifest, fresh, { dir });
+      const cached = this.app.plugins && this.app.plugins.manifests && this.app.plugins.manifests[this.manifest.id];
+      if (cached && cached !== this.manifest) Object.assign(cached, fresh, { dir: cached.dir || dir });
+    } catch (e) {
+      console.error('[Trip Buddy] manifest.json', e);
+    }
+  }
+
   /** Met à jour le module et les skills IA vers la version `info.latest` (résultat de checkUpdate),
    *  puis recharge le module. Les notes et les réglages ne sont pas touchés (voir TBUpdater). */
   async installUpdate(info) {
@@ -10382,17 +10398,29 @@ class TripBuddyPlugin extends Plugin {
     const res = await up.install(r.json, { expectedVersion: info.latest, currentVersion: this.manifest.version });
     this.updateInfo = null;
     new Notice(`✅ Trip Buddy mis à jour en ${info.latest} (${res.written} fichiers). Ancienne version copiée dans ${res.backup}. Rechargement du module…`, 10000);
-    // rechargement : le module se désactive puis se réactive avec le nouveau code
+    // rechargement : le module se désactive puis se réactive avec le nouveau code.
+    // Obsidian garde en mémoire le manifest.json lu au démarrage : on le rafraîchit d'abord,
+    // sinon le module rechargé croirait être encore dans l'ancienne version.
     const id = this.manifest.id;
     const app = this.app;
+    const adapter = this.app.vault.adapter;
+    const dir = this.manifest.dir;
+    const expected = info.latest;
     setTimeout(async () => {
       try {
+        const fresh = JSON.parse(await adapter.read(`${dir}/manifest.json`));
+        const cached = app.plugins.manifests && app.plugins.manifests[id];
+        if (cached) Object.assign(cached, fresh, { dir: cached.dir || dir });
         await app.plugins.disablePlugin(id);
         await app.plugins.enablePlugin(id);
+        const loaded = app.plugins.plugins && app.plugins.plugins[id];
+        const v = loaded && loaded.manifest && loaded.manifest.version;
+        if (v !== expected) throw new Error(`version chargée : ${v || 'inconnue'}`);
+        new Notice(`🎉 Trip Buddy ${v} est chargé.`, 6000);
         if (app.setting && app.setting.containerEl && app.setting.containerEl.isConnected) app.setting.openTabById(id);
       } catch (e) {
         console.error('[Trip Buddy] rechargement', e);
-        new Notice('Désactivez puis réactivez Trip Buddy (Réglages → Plugins communautaires) pour terminer la mise à jour.', 0);
+        new Notice(`Les fichiers de la version ${expected} sont installés. Redémarrez Obsidian pour la charger.`, 0);
       }
     }, 400);
     return res;
