@@ -1,7 +1,7 @@
 {
   "id": "trip-buddy",
   "name": "Trip Buddy",
-  "version": "1.2.6",
+  "version": "1.2.7",
   "minAppVersion": "1.4.0",
   "description": "Organisez un voyage : POI géocodés, carte OSM, programme jour par jour, journal, budget, packing list et documents.",
   "author": "Trip Buddy",
