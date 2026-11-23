@@ -663,6 +663,15 @@ class DashboardBlock extends TBBlock {
       });
     });
 
+    /* ---- aide visuelle (à côté du thème) */
+    const helpOn = TBHelp.enabled(this.plugin);
+    const hb = hero.createEl('button', { cls: 'tb-help-toggle' + (helpOn ? ' is-active' : ''), text: '💡' });
+    const hl = helpOn ? 'Masquer l’aide visuelle' : 'Afficher l’aide visuelle : aides contextuelles et liens vers les réglages';
+    hb.setAttr('title', hl);
+    hb.setAttr('aria-label', hl);
+    hb.setAttr('aria-pressed', String(helpOn));
+    hb.addEventListener('click', (e) => { e.preventDefault(); TBHelp.toggle(this.plugin); });
+
     /* ---- tuiles de navigation */
     const spent = expenses.reduce((a, e) => a + e.amountMain, 0);
     const budget = Number(s.trip.budget) || s.expenseCategories.reduce((a, c) => a + (Number(c.budget) || 0), 0);

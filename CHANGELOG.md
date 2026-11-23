@@ -8,6 +8,13 @@ Chaque version publiée est disponible en téléchargement, prête à ouvrir dan
 
 ## [Non publié]
 
+### Ajouté
+- **Aide visuelle** : bouton 💡 à côté du choix du thème sur l'accueil (et commande *Afficher / masquer l'aide visuelle*). Activée, elle affiche de petites aides d'une ligne à côté de chaque zone des pages (en-tête, tuiles, carte, catégories, budget, actions…) : ce qui s'y règle, avec un lien direct vers la bonne section des réglages, et les options de chaque bloc.
+- Chaque section des réglages a une ancre : un lien peut ouvrir les réglages directement sur elle.
+
+### Corrigé
+- Ouverture des réglages sur une section (bouton « Repartir de zéro » du bandeau d'exemple, liens de l'aide) : l'onglet arrivait tout en bas au lieu de la section, notamment quand les réglages s'ouvrent dans une fenêtre à part.
+
 ## [1.3.0] - 2026-11-23
 
 ### Ajouté

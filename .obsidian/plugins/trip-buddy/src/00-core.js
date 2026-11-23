@@ -177,6 +177,7 @@ const DEFAULT_SETTINGS = {
     hideProperties: true, // masque le bloc « Propriétés » en tête des notes
     hideInlineTitle: false, // masque le titre affiché en haut des notes
     updateBanner: true, // panneau « nouvelle version » au-dessus du menu principal
+    helpMode: false, // aide visuelle : encadrés explicatifs en tête des blocs (bouton 💡 de l'accueil)
     journalQuickAdd: true, // zone de saisie sous chaque section du journal (mode lecture)
     pageWidth: 'wide', // largeur des pages du voyage : normal | wide | full
     theme: 'default', // thème des pages du voyage : default | dark

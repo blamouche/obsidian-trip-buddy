@@ -136,6 +136,7 @@ class TripBuddyPlugin extends Plugin {
       new Notice(n ? `📚 ${n} page(s) ajoutée(s) au guide` : '📚 Le guide est déjà complet');
       this.openPath(this.settings.files.guide);
     });
+    cmd('toggle-help', 'Afficher / masquer l’aide visuelle', () => TBHelp.toggle(this));
     cmd('reset-trip', 'Vider les données d’exemple (nouveau voyage)', () => this.confirmReset());
 
     this.settingTab = new TripBuddySettingTab(this.app, this);
@@ -562,17 +563,47 @@ class TripBuddyPlugin extends Plugin {
       return;
     }
     if (!section) return;
-    // l'onglet est construit à l'ouverture : on attend son rendu avant de défiler
-    const reveal = (tries) => {
+    // L'onglet est construit à l'ouverture, et la fenêtre des réglages (fenêtre à part depuis Obsidian 1.15)
+    // finit sa mise en page après coup : on place directement la position de défilement du conteneur
+    // qui défile (sans animation), puis on la réapplique quelques fois pendant la première seconde,
+    // sauf si l'utilisateur fait défiler lui-même entre-temps.
+    const find = () => {
       const root = this.settingTab && this.settingTab.containerEl;
-      const h = root && root.querySelector(`[data-tb-section="${section}"]`);
-      if (!h) { if (tries > 0) setTimeout(() => reveal(tries - 1), 80); return; }
-      h.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      h.removeClass('is-flash');
-      void h.offsetWidth;
-      h.addClass('is-flash');
+      return root && root.querySelector(`[data-tb-section="${section}"]`);
     };
-    requestAnimationFrame(() => reveal(10));
+    const scroller = (el) => {
+      for (let p = el.parentElement; p; p = p.parentElement) {
+        const oy = (p.ownerDocument.defaultView || window).getComputedStyle(p).overflowY;
+        if ((oy === 'auto' || oy === 'scroll') && p.scrollHeight > p.clientHeight + 1) return p;
+      }
+      return null;
+    };
+    let userScrolled = false;
+    let flashed = false;
+    const place = () => {
+      const h = find();
+      if (!h || userScrolled) return;
+      const sc = scroller(h);
+      if (sc) {
+        const top = h.getBoundingClientRect().top - sc.getBoundingClientRect().top + sc.scrollTop - 8;
+        if (Math.abs(sc.scrollTop - top) > 2) sc.scrollTop = top;
+        if (!sc.tbScrollWatch) {
+          sc.tbScrollWatch = true;
+          const stop = () => { userScrolled = true; };
+          sc.addEventListener('wheel', stop, { passive: true, once: true });
+          sc.addEventListener('touchmove', stop, { passive: true, once: true });
+          sc.addEventListener('keydown', stop, { once: true });
+          setTimeout(() => { sc.tbScrollWatch = false; sc.removeEventListener('wheel', stop); sc.removeEventListener('touchmove', stop); sc.removeEventListener('keydown', stop); }, 1500);
+        }
+      }
+      if (!flashed) {
+        flashed = true;
+        h.removeClass('is-flash');
+        void h.offsetWidth;
+        h.addClass('is-flash');
+      }
+    };
+    [0, 60, 150, 300, 500, 800, 1200].forEach((ms) => setTimeout(place, ms));
   }
 
   /* ------------------------------------------------------------ helpers */

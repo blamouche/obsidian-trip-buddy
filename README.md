@@ -82,6 +82,7 @@ La **barre de navigation** en haut de chaque page (bloc `tripbuddy-nav`) mène a
 ## 🏠 Accueil (tableau de bord)
 - **En-tête** : emoji, destination, nom et dates du voyage (nombre de jours), statut (à venir / en cours / terminé), avatars des voyageurs, accès aux réglages ⚙️ et sélecteur de thème 🎨 / 🌙. Le **dégradé de fond reprend les couleurs de l'emoji du voyage** (🇮🇹 rouge → vert, 🌸 rose, ✈️ bleu…), assombries pour que le texte reste lisible, et en version plus sombre avec le thème 🌙 ; un emoji sans couleur (⚫, 🐘…) garde le dégradé par défaut.
 - **Bandeau « Voyage d'exemple »** (tant que `demo` vaut `true` dans `trip-buddy.json`, c'est le cas du coffre téléchargé) : rappelle que le voyage est fictif, avec un bouton **🧹 Repartir de zéro** qui ouvre directement la section *Préparer un nouveau voyage* des réglages. *Masquer ce message* le retire sans rien effacer ; *Vider les données d'exemple* le retire aussi.
+- **💡 Aide visuelle** (bouton à gauche du choix du thème 🎨 / 🌙) : affiche de **petites aides d'une ligne à côté de chaque zone** des pages du voyage (en-tête, tuiles, carte, catégories, budget par catégorie, actions d'une fiche…) : ce qui s'y règle, avec un **lien direct vers la bonne section des réglages**, et sous chaque bloc ses options. *Masquer l'aide* (sous le menu), le même bouton ou la commande *Afficher / masquer l'aide visuelle* la retire.
 - **Tuiles** avec progression : jours planifiés, lieux géolocalisés, lieux faits, jours écrits dans le journal, budget dépensé / prévu, valise prête (%), nombre de documents. Ctrl/Cmd + clic ouvre dans un nouvel onglet.
 - **Journée en cours** (aujourd'hui pendant le voyage, sinon le prochain jour ou le premier) : étapes du programme, boutons ✍️ Journal et 💸 Dépense, ou 🗓️ *Planifier la journée* si rien n'est prévu.
 - **Carte de tous les lieux** avec l'itinéraire du jour, bouton ⛶ plein écran.
@@ -323,6 +324,7 @@ Toutes préfixées par **Trip Buddy :** dans la palette de commandes (Ctrl/Cmd +
 | Créer les pages du guide de voyage | Recrée l'index et les pages de base manquantes |
 | Changer de thème (défaut ↔ sombre) | Bascule le thème de Trip Buddy |
 | Afficher / masquer les propriétés des notes | Bascule l'option d'affichage |
+| Afficher / masquer l'aide visuelle | Petites aides contextuelles et liens vers les réglages dans chaque page |
 | Vider les données d'exemple (nouveau voyage) | Voir [[#🧳 Nouveau voyage|Nouveau voyage]] |
 
 Le « jour courant » est aujourd'hui si l'on est pendant le voyage, sinon le prochain jour du voyage, sinon le premier.
@@ -343,7 +345,7 @@ Toutes les modifications s'appliquent immédiatement à toutes les pages. Les r�
 | 🧭 **Itinéraire et « Ouvrir dans »** | Service pour les boutons *Itinéraire / Y aller* et *Ouvrir dans* : OpenStreetMap, Google Maps (à pied), ou un fournisseur personnalisé avec ses URL. Variables : `{lat}` `{lon}` `{name}` `{address}` `{query}`. Exemple Apple Plans : `https://maps.apple.com/?daddr={lat},{lon}&dirflg=w`. |
 | 🧭 **Menu principal** | Ordre des rubriques de la barre de navigation (↑ ↓, ↺ ordre par défaut) et rubriques affichées (👁 / 🙈 par rubrique, 👁 tout afficher). Une rubrique masquée disparaît seulement du menu : ses pages restent accessibles. Au moins une rubrique reste affichée. |
 | 📂 **Dossiers et pages** | Dossiers (documents, journal, POI, programmes, modèles), pages (accueil, programme, carte, index des POI, journal, budget, valise, documents) et modèles (POI, journal, programme). |
-| 🧾 **Affichage des notes** | Thème (*Par défaut* qui suit Obsidian, ou *Sombre*) ; style des pictogrammes (*Traits* : icônes fines monochromes, ou *Emoji*) ; panneau des mises à jour au-dessus du menu (activé par défaut) ; masquer les propriétés ; masquer le titre en haut des notes ; saisie rapide ; largeur des pages du voyage (standard, large 1 180 px, pleine largeur) ; ouvrir les notes en mode lecture ; dossier des images et fichiers collés. Ces options sont gérées par le module et réappliquées à chaque démarrage, même si la configuration d'Obsidian est réinitialisée (synchronisation…). |
+| 🧾 **Affichage des notes** | Thème (*Par défaut* qui suit Obsidian, ou *Sombre*) ; style des pictogrammes (*Traits* : icônes fines monochromes, ou *Emoji*) ; aide visuelle (aides contextuelles, désactivée par défaut) ; panneau des mises à jour au-dessus du menu (activé par défaut) ; masquer les propriétés ; masquer le titre en haut des notes ; saisie rapide ; largeur des pages du voyage (standard, large 1 180 px, pleine largeur) ; ouvrir les notes en mode lecture ; dossier des images et fichiers collés. Ces options sont gérées par le module et réappliquées à chaque démarrage, même si la configuration d'Obsidian est réinitialisée (synchronisation…). |
 | ↔️ **Colonnes latérales** | Repli automatique des colonnes inactives (jamais pendant le survol ou la saisie), délai d'inactivité (secondes, minimum 2), colonnes concernées (gauche, droite ou les deux). |
 | 🏠 **Démarrage** | Ouvrir l'accueil à l'ouverture d'Obsidian ; rouvrir l'accueil quand tous les onglets sont fermés. |
 | 📥 **Cartes hors ligne** | Voir [[#📥 Cartes hors ligne|Cartes hors ligne]]. |
@@ -408,6 +410,7 @@ Sans connexion : les notes, le programme, le budget, le journal, les traces GPX,
 | `30-modals.js` · `35-emoji.js` | Géocodage et fenêtres (lieu, dépense, programme, valise…) · sélecteur d'emoji et couleurs d'un emoji (`emojiPalette`, dégradé de l'en-tête) |
 | `40-blocks-poi.js` · `41-programme.js` · `42-budget.js` · `43-modules.js` | Blocs `tripbuddy-*` |
 | `44-journal-quickadd.js` · `45-guide.js` | Saisie rapide en mode lecture · guide |
+| `46-help.js` | Aide visuelle : aides contextuelles par bloc et par zone (`HELP_SPOTS`), sections des réglages (`SETTINGS_SECTIONS`, ancres de `openSettings(id)`) |
 | `47-booklet.js` · `48-export.js` | Carnet A6 · export A4 |
 | `50-views.js` · `60-settings.js` · `80-sidebars.js` · `90-plugin.js` | Vue carte · réglages · repli des colonnes · plugin principal et commandes |
 

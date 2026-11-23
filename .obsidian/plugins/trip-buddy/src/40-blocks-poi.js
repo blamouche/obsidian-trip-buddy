@@ -51,7 +51,7 @@ class TBRenderChild extends MarkdownRenderChild {
   run(fn) {
     try {
       const p = fn();
-      if (p && p.catch) p.catch((e) => this.fail(e));
+      Promise.resolve(p).then(() => TBHelp.attach(this), (e) => this.fail(e));
     } catch (e) { this.fail(e); }
   }
 

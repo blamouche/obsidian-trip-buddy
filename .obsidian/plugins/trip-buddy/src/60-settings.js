@@ -68,7 +68,8 @@ class TripBuddySettingTab extends PluginSettingTab {
   /** Titre de section ; `id` permet d'y accéder directement (plugin.openSettings(id)) */
   heading(c, text, desc, id) {
     const h = c.createDiv('tb-set-heading');
-    if (id) h.dataset.tbSection = id;
+    const sid = id || SETTINGS_SECTION_IDS[text]; // ancre pour plugin.openSettings(id) (aide visuelle…)
+    if (sid) h.dataset.tbSection = sid;
     h.createEl('h3', { text });
     if (desc) h.createDiv({ cls: 'setting-item-description', text: desc });
   }
@@ -89,6 +90,7 @@ class TripBuddySettingTab extends PluginSettingTab {
     c.addClass('tb-settings');
 
     const intro = c.createDiv('tb-set-intro');
+    intro.dataset.tbSection = 'version';
     intro.createDiv({ cls: 'tb-set-logo', text: s.trip.emoji || '✈️' });
     const it = intro.createDiv();
     it.createEl('h2', { text: 'Trip Buddy' });
@@ -238,6 +240,9 @@ class TripBuddySettingTab extends PluginSettingTab {
     new Setting(c).setName('Saisie rapide (journal, accueil, programmes, idées, « Mes notes » des lieux)')
       .setDesc('En mode lecture, affiche une zone de texte sous chaque section des entrées de journal, des « Notes rapides » de l’accueil et de la section « Mes notes » des fiches de lieux, pour ajouter, modifier ou supprimer du texte et des photos sans passer en mode édition. Dans les fiches de lieux, tout le texte se modifie ou se supprime ; l’ajout se fait dans « Mes notes ».')
       .addToggle((t) => t.setValue(!!disp.journalQuickAdd).onChange((v) => { disp.journalQuickAdd = v; this.save(); }));
+    new Setting(c).setName('Aide visuelle')
+      .setDesc('Affiche de petites aides à côté de chaque zone des pages du voyage : ce qui s’y règle, avec un lien direct vers la bonne section de ces réglages. Aussi : bouton 💡 à côté du thème sur l’accueil, ou commande « Afficher / masquer l’aide visuelle ».')
+      .addToggle((t) => t.setValue(!!disp.helpMode).onChange((v) => { disp.helpMode = v; this.save(); }));
     new Setting(c).setName('Signaler les mises à jour au-dessus du menu')
       .setDesc('Quand une nouvelle version de Trip Buddy est publiée, affiche un panneau au-dessus du menu principal, avec un bouton pour mettre à jour. Vérification sur GitHub au plus toutes les 6 heures.')
       .addToggle((t) => t.setValue(disp.updateBanner !== false).onChange((v) => { disp.updateBanner = v; this.save(); }));
