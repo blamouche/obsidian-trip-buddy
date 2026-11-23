@@ -8,6 +8,8 @@ Chaque version publiée est disponible en téléchargement, prête à ouvrir dan
 
 ## [Non publié]
 
+## [1.3.0] - 2026-11-23
+
 ### Ajouté
 - Réglages versionnés : `trip-buddy.json` porte un numéro `settingsVersion` ; au chargement, les migrations nécessaires sont appliquées (réglage renommé ou transformé, élément ajouté à une liste par défaut), puis le fichier est réécrit une fois.
 - Contrôle des types des réglages : une valeur au format inattendu est corrigée (texte → nombre, « Camille, Thomas » → liste…) ou remplacée par sa valeur par défaut, et signalée par une notice.
