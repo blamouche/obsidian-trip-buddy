@@ -11,3 +11,4 @@
 
 # Verrou temporaire du géocodage
 .trip-planner/.nominatim-lock
+dist/

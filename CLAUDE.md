@@ -49,6 +49,12 @@ Les dossiers réels sont définis dans les réglages (`folders` et `files` de `t
 - Rôle de chaque fichier source : README § *Développement du module*. Mettre à jour le README quand un comportement visible change.
 - **Nouveau voyage** : la commande *« Trip Buddy : Vider les données d'exemple (nouveau voyage) »* efface **définitivement** (via `.trash`, vidée à la fin) **tout le contenu** des dossiers documents, journal, POI, programme et guide (sauf les pages d'index et les pages standard du guide, remises à blanc), `CONTEXT.md` et `.trip-planner/`, vide les sections libres (Notes rapides, Idées en vrac…), retire les réseaux de transports, supprime les cartes hors ligne de l'appareil, renomme le voyage « My trip » 🧳 et remet participants, destination, dates et budgets à zéro, vide le budget, décoche la valise et remet le guide à blanc. Toute nouvelle donnée propre à un voyage créée par un skill doit être ajoutée à ce nettoyage (`SKILL_DATA` dans `src/00-core.js`, `resetSkillData` dans `src/90-plugin.js`).
 
+## Versions (dépôt GitHub public `blamouche/obsidian-trip-buddy`)
+
+- Toute modification visible (module, skills, modèles, coffre d'exemple) s'ajoute à la section `## [Non publié]` de `CHANGELOG.md` (*Ajouté* / *Modifié* / *Corrigé* / *Retiré*), en français.
+- Publier une version = `sh .github/scripts/release.sh X.Y.Z` (seulement à la demande de l'utilisateur) : met à jour CHANGELOG, `manifest.json` et le README, construit, commite, tague `vX.Y.Z` et pousse ; GitHub Actions publie alors le paquet `trip-buddy-vX.Y.Z.zip` (coffre prêt à ouvrir) sur Releases. Détails : README § *Versions et paquets*.
+- Le dépôt est **public** : ne jamais commiter de vraies données de voyage ni de données personnelles (le coffre d'exemple est fictif).
+
 ## Skills de planification (`.claude/skills/`)
 
 Ils s'enchaînent ; chacun lit ce que le précédent a produit.

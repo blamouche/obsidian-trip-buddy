@@ -26,6 +26,8 @@ Il rassemble dans un seul coffre : les lieux à voir (POI géocodés), une carte
 ---
 
 ## 🚀 Démarrage
+**Télécharger** : chaque version est publiée, prête à l'emploi, sur la page [Releases](https://github.com/blamouche/obsidian-trip-buddy/releases/latest) du dépôt. Téléchargez `trip-buddy-vX.Y.Z.zip`, décompressez-le, puis dans Obsidian choisissez *Ouvrir un dossier comme coffre* → dossier **Trip Buddy**. Les nouveautés de chaque version sont dans [[CHANGELOG]].
+
 1. Ouvrez le coffre puis, si Obsidian le demande, **faites confiance à l'auteur** et activez les plugins communautaires (Réglages → Plugins communautaires → *Trip Buddy* activé).
 2. Ouvrez [[00 Accueil]] : c'est le tableau de bord du voyage (il s'ouvre aussi tout seul au démarrage).
 3. Réglez le voyage dans **Réglages → Trip Buddy** (ou ⚙️ sur l'accueil) : nom, destination, emoji, dates, voyageurs, devise, budget, catégories…
@@ -59,6 +61,7 @@ Deux icônes sont ajoutées dans le ruban de gauche : 🗺️ **carte du voyage*
 | `06 Programme` | Une note par journée planifiée (`Programme AAAA-MM-JJ.md`) + le planificateur. |
 | `07 Carte` | La carte OpenStreetMap de tous les lieux. |
 | `08 Guide` | Le guide de la destination : transports, nourriture, langue, histoire, pourboires, sécurité, numéros utiles, formalités… et vos pages ajoutées. |
+| `CHANGELOG.md` | Journal des versions : nouveautés et corrections de chaque version. |
 | `docs/screenshots` | Captures d'écran utilisées par ce mode d'emploi (sans effet sur le module). |
 | `99 Modèles` | Modèles de notes (POI, journal, programme) et de valises (`Packing - City trip`, `Packing - Plage`, `Packing - Randonnée`). Les notes de ce dossier sont ignorées par le module. |
 
@@ -398,6 +401,19 @@ Sans connexion : les notes, le programme, le budget, le journal, les traces GPX,
 ```bash
 sh .obsidian/plugins/trip-buddy/build.sh
 ```
+
+### Versions et paquets
+- Numérotation `X.Y.Z` ([SemVer](https://semver.org/lang/fr/)) : **majeure** si un format de note ou de réglage change sans compatibilité, **mineure** pour une nouveauté, **correctif** pour une correction. Le numéro est celui de `.obsidian/plugins/trip-buddy/manifest.json`.
+- Au fil des changements, les décrire dans la section `## [Non publié]` de [[CHANGELOG]] (*Ajouté*, *Modifié*, *Corrigé*, *Retiré*).
+- Publier une version, depuis `main` avec tout commité :
+
+```bash
+sh .github/scripts/release.sh 1.1.0
+```
+
+  Le script transforme *Non publié* en section `[1.1.0]` datée, met le numéro à jour (manifest et ce mode d'emploi), reconstruit le module, vérifie le paquet, commite « Version 1.1.0 », pose le tag `v1.1.0` et pousse. Le tag déclenche l'action GitHub *Release* (`.github/workflows/release.yml`) qui publie `trip-buddy-v1.1.0.zip` — le coffre complet, CHANGELOG compris — avec la section du CHANGELOG comme notes de version.
+- Tester le paquet en local sans rien publier : `sh .github/scripts/package.sh <version actuelle> dist` (le dossier `dist/` est ignoré par git).
+- Le paquet contient les fichiers suivis par git, sauf l'outillage du dépôt (`.github`, `.gitignore`, `.gitattributes`) : jamais `.trash`, l'état des fenêtres ni les réglages de synchronisation.
 
 ## 📜 Licence
 Code du module, skills et modèles : licence **MIT** (voir [LICENSE](LICENSE)).
