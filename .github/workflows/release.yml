@@ -1,10 +1,17 @@
 # Publie une version : à chaque tag vX.Y.Z, construit le coffre prêt à l'emploi
 # (trip-buddy-vX.Y.Z.zip, CHANGELOG inclus) et crée la release GitHub correspondante.
+# Relance manuelle possible (onglet Actions → Release → Run workflow, ou
+# `gh workflow run release.yml -f tag=vX.Y.Z`) si le tag n'a pas déclenché l'action.
 name: Release
 
 on:
   push:
     tags: ['v*.*.*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag existant à publier (ex. v1.2.0)'
+        required: true
 
 permissions:
   contents: write
@@ -12,8 +19,12 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
+    env:
+      TAG: ${{ inputs.tag || github.ref_name }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
 
       - uses: actions/setup-node@v4
         with:
@@ -21,7 +32,7 @@ jobs:
 
       - name: Construire le paquet
         run: |
-          VERSION="${GITHUB_REF_NAME#v}"
+          VERSION="${TAG#v}"
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
           sh .github/scripts/package.sh "$VERSION" dist
 
@@ -29,7 +40,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$GITHUB_REF_NAME" "dist/trip-buddy-v$VERSION.zip" \
+          gh release create "$TAG" "dist/trip-buddy-v$VERSION.zip" \
             --title "Trip Buddy $VERSION" \
             --notes-file dist/release-notes.md \
             --verify-tag
