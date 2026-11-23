@@ -48,6 +48,7 @@ const HELP_SPOTS = {
       { at: '.tb-hero', pos: 'after', text: 'En-tête : nom, destination, dates, voyageurs ; le dégradé reprend les couleurs de l’emoji du voyage', links: ['trip'] },
       { at: '.tb-hero', pos: 'after', text: 'Thème 🎨 / 🌙, pictogrammes et largeur des pages ; accueil ouvert au démarrage', links: ['display', 'startup'] },
       { at: '.tb-tiles', pos: 'after', text: 'Tuiles : chacune ouvre la page de sa rubrique', links: ['folders'] },
+      { at: '.tb-ai-card', pos: 'after', text: 'Encart IA : affiché quand Claude ou ChatGPT est installé ; à masquer ici', links: ['display'] },
       { at: '.tb-dash-day', pos: 'before', text: 'Journée du jour : les journées suivent les dates du voyage', links: ['trip'] },
       { at: '.tb-dash-map', pos: 'before', text: 'Carte : fond, centre et zoom, traces GPX, cartes hors ligne, transports en commun', links: ['map', 'offline', 'transit'] },
     ],

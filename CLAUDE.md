@@ -27,7 +27,8 @@ Ce dossier est un **coffre Obsidian** qui sert à préparer et vivre **un voyage
 | `CONTEXT.md` | Contexte du voyage (skill `travel-context`) | |
 | `trip-buddy.json` | Réglages du module (modifiables par les agents) | JSON |
 | `.trip-planner/` | Travail intermédiaire du skill `travel-planner` (caché dans Obsidian) | |
-| `.claude/skills/` | Skills de planification | |
+| `.claude/skills/` | Skills de planification (source, lus par Claude Code) | format Agent Skills |
+| `.agents/skills/` · `AGENTS.md` | Copie des skills et consignes pour Codex / ChatGPT | générés, ne pas modifier |
 
 Les dossiers réels sont définis dans les réglages (`folders` et `files` de `trip-buddy.json`, à la racine) : s'y fier s'ils diffèrent de ce tableau.
 
@@ -58,7 +59,11 @@ Les dossiers réels sont définis dans les réglages (`folders` et `files` de `t
 - Le bouton *Mettre à jour* des réglages (`src/18-updater.js`) ne remplace que le dossier du module (sauf `data.json`) et les skills livrés de `.claude/skills` : tout nouveau fichier du module ou des skills doit rester dans ces dossiers ; ne jamais y ranger de données du voyage.
 - Le dépôt est **public** : ne jamais commiter de vraies données de voyage ni de données personnelles (le coffre d'exemple est fictif).
 
-## Skills de planification (`.claude/skills/`)
+## Skills de planification (`.claude/skills/`, copie dans `.agents/skills/`)
+
+Format ouvert *Agent Skills* : les mêmes skills servent à Claude (Claude Code lit `.claude/skills`) et à ChatGPT / Codex (Codex lit `.agents/skills` et `AGENTS.md`). Règles :
+- **Ne modifier que `.claude/skills`**, puis recopier avec `sh .github/scripts/sync-skills.sh` (le paquet est refusé si les deux dossiers diffèrent).
+- Rester **neutre vis-à-vis de l'agent** dans les `SKILL.md` : chemins relatifs au dossier du skill (`<skill>/scripts/…`), questions *(choix)* / *(choix multiple)* plutôt qu'un nom d'outil, sous-agents « si l'agent en dispose » ; les particularités de chaque agent vont dans la section *Compatibilité* de chaque skill.
 
 Ils s'enchaînent ; chacun lit ce que le précédent a produit.
 

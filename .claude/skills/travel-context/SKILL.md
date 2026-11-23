@@ -9,16 +9,22 @@ Premier skill du set de planification de voyage. Son rôle : **comprendre le voy
 
 Toute la conversation se fait **en français**, sur un ton chaleureux et concret.
 
+## Compatibilité (Claude, ChatGPT / Codex)
+
+Ce skill suit le format ouvert *Agent Skills* : il fonctionne avec Claude (Claude Code, Claude) comme avec ChatGPT et Codex.
+- **Questions à choix** — quand ce document indique *(choix)* ou *(choix multiple)* : utiliser l'outil de questions à choix de l'agent s'il en a un (AskUserQuestion dans Claude Code), sinon proposer les options en **liste numérotée** en laissant répondre librement (« Autre »).
+- **Sans accès aux fichiers du coffre** (skill importé dans ChatGPT ou Claude dans le navigateur) : mener l'interview de la même façon, puis donner le **contenu complet de `CONTEXT.md`** à copier à la racine du coffre, et les valeurs à reporter dans `trip-buddy.json` (§ 4).
+
 ## 1. Avant de poser des questions
 
 1. **Vérifier si `CONTEXT.md` existe** à la racine du coffre.
-   - S'il existe : le lire, résumer en 3-4 lignes ce qu'il contient, puis demander (AskUserQuestion) : *Mettre à jour ce voyage* / *Repartir de zéro pour un nouveau voyage*. En mise à jour, ne reposer que les questions dont la réponse manque, est floue, ou que l'utilisateur veut changer. Pour repartir de zéro, copier l'ancien fichier dans `.trash/CONTEXT - <nom du voyage>.md` avant de l'écraser.
+   - S'il existe : le lire, résumer en 3-4 lignes ce qu'il contient, puis demander *(choix)* : *Mettre à jour ce voyage* / *Repartir de zéro pour un nouveau voyage*. En mise à jour, ne reposer que les questions dont la réponse manque, est floue, ou que l'utilisateur veut changer. Pour repartir de zéro, copier l'ancien fichier dans `.trash/CONTEXT - <nom du voyage>.md` avant de l'écraser.
 2. **Lire les réglages Trip Buddy** dans `trip-buddy.json` (racine du coffre), clé `trip` (`name`, `destination`, `start`, `end`, `travelers`, `currency`, `budget`, `emoji`). S'ils décrivent déjà le voyage, s'en servir pour **proposer** des réponses (« J'ai vu Barcelone du 20 au 22 novembre avec Camille et Thomas — c'est bien ce voyage ? ») plutôt que de redemander. Attention : le coffre peut encore contenir le voyage d'exemple ou le voyage précédent ; toujours faire confirmer.
    - Ne jamais modifier `.obsidian/plugins/trip-buddy/data.json` (simple copie de secours). Les réglages se mettent à jour dans `trip-buddy.json`, à la fin de l'interview (voir § 4).
 
 ## 2. L'interview
 
-Poser les questions **par petits groupes** (2 à 4 à la fois), jamais un long questionnaire d'un bloc. Utiliser **AskUserQuestion** dès que les réponses se prêtent à des choix (options + « Autre » automatique), et des questions ouvertes en texte pour le reste. Rebondir sur les réponses : une précision intéressante mérite une question de relance, une réponse vague mérite un exemple (« plutôt musées le matin et terrasse l'après-midi ? »).
+Poser les questions **par petits groupes** (2 à 4 à la fois), jamais un long questionnaire d'un bloc. Proposer des **questions à choix** (voir *Compatibilité*) dès que les réponses s'y prêtent (options + « Autre »), et des questions ouvertes en texte pour le reste. Rebondir sur les réponses : une précision intéressante mérite une question de relance, une réponse vague mérite un exemple (« plutôt musées le matin et terrasse l'après-midi ? »).
 
 ### Tour 1 — Le voyage
 - **Lieu** : pays, ville(s) ou région(s). Voyage itinérant ou point de chute unique ? Destination déjà choisie ou encore à arbitrer entre plusieurs options (dans ce cas, noter les options et les critères de choix) ?
@@ -26,12 +32,12 @@ Poser les questions **par petits groupes** (2 à 4 à la fois), jamais un long q
 - **Déjà venus ?** Première fois sur place ou destination connue (et qu'ont-ils déjà vu) ?
 
 ### Tour 2 — Les participants
-- **Formule** (AskUserQuestion) : Solo · En couple · En famille · Entre amis (+ Autre : collègues, groupe…).
+- **Formule** *(choix)* : Solo · En couple · En famille · Entre amis (+ Autre : collègues, groupe…).
 - **Qui** : prénoms, et selon la formule : âge des enfants, nombre d'amis, personnes plus âgées…
 - **Besoins particuliers** : mobilité, santé, régime alimentaire / allergies, sommeil, animal, enfant en poussette, phobie (avion, foule, hauteur)…
 
 ### Tour 3 — Les objectifs
-- **Pourquoi ce voyage** (AskUserQuestion, multiSelect) : Se reposer · Découvrir la culture et l'histoire · Gastronomie · Nature et randonnée · Fête / vie nocturne · Aventure / sport · Moment romantique · Moment en famille / entre amis · Célébrer une occasion (anniversaire, lune de miel…) · Photographie.
+- **Pourquoi ce voyage** *(choix multiple)* : Se reposer · Découvrir la culture et l'histoire · Gastronomie · Nature et randonnée · Fête / vie nocturne · Aventure / sport · Moment romantique · Moment en famille / entre amis · Célébrer une occasion (anniversaire, lune de miel…) · Photographie.
 - **Le voyage réussi** : « À votre retour, qu'est-ce qui vous fera dire que c'était un super voyage ? »
 - **Incontournables** déjà en tête (lieux, expériences, restaurants, événements).
 
@@ -44,7 +50,7 @@ Demander explicitement **les deux côtés**, avec des exemples pour amorcer :
 ### Tour 5 — Centres d'intérêt (types de lieux à repérer)
 Objectif : savoir **quels types de lieux précis** l'utilisateur aime dénicher partout où il voyage, pour que les autres skills les cherchent dans la destination et les ajoutent comme POI. Ce sont souvent des passions personnelles, parfois très pointues : ne pas se limiter aux catégories touristiques classiques.
 - Question ouverte d'abord : « Y a-t-il des types d'endroits que vous aimez visiter dans chaque ville, par passion ou par curiosité ? » avec des exemples variés pour amorcer : pâtisseries, fabricants et magasins de chapeaux, magasins de guitares, théâtres, cinémas (d'art et d'essai, anciens), disquaires, librairies, caves à vin, brocantes et puces, ateliers d'artisans, galeries, salles de concert, boutiques vintage, épiceries fines, torréfacteurs, jardins botaniques, architecture d'un style particulier…
-- Puis (AskUserQuestion, multiSelect) proposer les familles les plus probables au vu des réponses précédentes, pour faire émerger ce qui n'aurait pas été dit.
+- Puis *(choix multiple)* proposer les familles les plus probables au vu des réponses précédentes, pour faire émerger ce qui n'aurait pas été dit.
 - Pour chaque centre d'intérêt retenu, faire préciser :
   - **ce qui compte** (« magasins de guitares : plutôt vintage et luthiers que grandes enseignes », « cinéma : salles anciennes, VO ») ;
   - **l'envie** : *incontournable* (à chercher absolument) ou *si on passe devant* (bonus) ;
@@ -52,7 +58,7 @@ Objectif : savoir **quels types de lieux précis** l'utilisateur aime dénicher 
 - Si un centre d'intérêt correspond à une catégorie de POI Trip Buddy existante (clé `poiCategories` de `trip-buddy.json`, ex. ☕ Café & pâtisserie, 🎵 Disquaire), l'indiquer ; sinon, le noter comme catégorie à créer.
 
 ### Tour 6 — Pour aller plus loin (facultatif)
-Proposer ce tour en précisant qu'on peut le passer (AskUserQuestion : *Oui, continuons* / *On s'arrête là*) :
+Proposer ce tour en précisant qu'on peut le passer *(choix : Oui, continuons / On s'arrête là)* :
 - **Rythme** : Tranquille · Équilibré · Intense ; matinal ou couche-tard ?
 - **Budget** : ordre de grandeur total ou par jour, devise, postes où l'on accepte de se faire plaisir et ceux où l'on économise.
 - **Logistique** : transport aller/retour (réservé ? avion, train, voiture), hébergement (réservé ? type souhaité), déplacements sur place.

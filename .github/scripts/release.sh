@@ -33,6 +33,9 @@ fi
 sed -i.bak "s/\"version\": *\"[^\"]*\"/\"version\": \"$VERSION\"/" "$PLUGIN/manifest.json" && rm "$PLUGIN/manifest.json.bak"
 sed -i.bak "s/version [0-9][0-9.]*, Obsidian/version $VERSION, Obsidian/" README.md && rm README.md.bak
 
+# skills : copie pour Codex / ChatGPT (.agents/skills) à jour
+sh .github/scripts/sync-skills.sh >/dev/null
+
 # build + vérifications, puis paquet de contrôle en local (non commité)
 sh "$PLUGIN/build.sh" >/dev/null
 node --check "$PLUGIN/main.js"

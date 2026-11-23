@@ -529,6 +529,13 @@ li > .tb-inline-edit { margin: 4px 0 6px; }
 .tb-doc-drop-hint { grid-column: 1 / -1; padding: 18px; text-align: center; font-size: 13px; color: var(--text-muted); border: 1px dashed var(--tb-border); border-radius: 12px; }
 
 /* ==== ACCUEIL ========================================================== */
+.tb-ai-card { display: flex; gap: 14px; align-items: flex-start; border: 1px solid color-mix(in srgb, #10b981 45%, transparent);
+  background: linear-gradient(135deg, color-mix(in srgb, #10b981 12%, var(--background-primary)), color-mix(in srgb, #6366f1 8%, var(--background-primary))); }
+.tb-ai-ico { font-size: 28px; line-height: 1; padding-top: 2px; }
+.tb-ai-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.tb-ai-title { font-weight: 800; font-size: 16px; }
+.tb-ai-text { color: var(--text-muted); font-size: 14px; line-height: 1.45; }
+.tb-ai-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 2px; }
 .tb-demo-notice { display: flex; gap: 14px; align-items: flex-start; border: 1.5px dashed color-mix(in srgb, var(--tb-accent) 55%, transparent); background: var(--tb-accent-soft); }
 .tb-demo-ico { font-size: 28px; line-height: 1; padding-top: 2px; }
 .tb-demo-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }

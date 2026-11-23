@@ -170,6 +170,12 @@ class TripBuddyPlugin extends Plugin {
       },
     });
 
+    // skills pour Codex / ChatGPT (.agents/skills) absents d'un coffre mis à jour par une ancienne version
+    this.app.workspace.onLayoutReady(() => {
+      TBUpdater.mirrorMissingSkills(this.app.vault.adapter, ['travel-context', 'travel-planner'])
+        .then((n) => { if (n) console.info(`[Trip Buddy] ${n} skill(s) recopié(s) dans .agents/skills`); })
+        .catch((e) => console.error('[Trip Buddy] skills', e));
+    });
     this.app.workspace.onLayoutReady(() => {
       if (this.settings.openHomeOnStartup) this.openHomeOnStartup();
       // rouvre l'accueil quand le dernier onglet est fermé
@@ -428,7 +434,7 @@ class TripBuddyPlugin extends Plugin {
       const j = r.json || {};
       const latest = String(j.tag_name || '').replace(/^v/, '');
       if (!latest) throw new Error('réponse inattendue');
-      const asset = (j.assets || []).find((a) => /\.zip$/i.test(a.name));
+      const asset = (j.assets || []).find((a) => /^trip-buddy-v.*\.zip$/i.test(a.name)) || (j.assets || []).find((a) => /\.zip$/i.test(a.name) && !/skill/i.test(a.name));
       const bundle = (j.assets || []).find((a) => /^trip-buddy-update.*\.json$/i.test(a.name));
       res = {
         ok: true, current, latest, newer: U.semverCmp(latest, current) > 0,
@@ -499,7 +505,7 @@ class TripBuddyPlugin extends Plugin {
       return;
     }
     new ConfirmModal(this, `⬇️ Mettre à jour Trip Buddy en ${u.latest} ?`,
-      `La mise à jour remplace le module Trip Buddy (${this.manifest.dir}) et les skills IA livrés (.claude/skills/travel-context, travel-planner) par ceux de la version ${u.latest}. `
+      `La mise à jour remplace le module Trip Buddy (${this.manifest.dir}) et les skills IA livrés (travel-context, travel-planner, dans .claude/skills et .agents/skills) par ceux de la version ${u.latest}. `
       + 'Vos notes, documents, journal, budget, valise, guide, CONTEXT.md et réglages (trip-buddy.json) ne sont pas modifiés. '
       + `La version actuelle (${this.manifest.version}) est copiée dans la corbeille du coffre (.trash) avant d’être remplacée. Le module se recharge à la fin.`,
       'Mettre à jour', async () => {

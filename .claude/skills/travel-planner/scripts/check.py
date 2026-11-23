@@ -54,7 +54,7 @@ def main():
     trip = settings.get("trip", {}) or {}
     cat_ids = {c.get("id") for c in settings.get("poiCategories", [])}
     attachments = {p.name for p in vault.rglob("*") if p.is_file() and ".trash" not in p.parts}
-    notes = {p.stem for p in vault.rglob("*.md") if ".trash" not in p.parts and ".claude" not in p.parts}
+    notes = {p.stem for p in vault.rglob("*.md") if not {".trash", ".claude", ".agents"} & set(p.parts)}
 
     # --- POI
     poi_dir = folder(vault, settings, "poi")

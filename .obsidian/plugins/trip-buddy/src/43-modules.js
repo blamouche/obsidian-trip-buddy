@@ -710,6 +710,25 @@ class DashboardBlock extends TBBlock {
       U.button(act, 'Masquer ce message', 'tb-btn-link', async () => { s.demo = false; await this.plugin.saveSettings(); });
     }
 
+    /* ---- assistants IA détectés sur cet ordinateur : encart « Trip Buddy + IA » */
+    if (s.display.aiPromo !== false && TBAi.any()) {
+      const ai = TBAi.detect();
+      const card = r.createDiv('tb-card tb-ai-card');
+      card.createDiv({ cls: 'tb-ai-ico', text: '🤖' });
+      const body = card.createDiv('tb-ai-body');
+      body.createDiv({ cls: 'tb-ai-title', text: 'Trip Buddy fonctionne super bien avec l’IA' });
+      const tools = [...ai.claude, ...ai.chatgpt];
+      body.createDiv({
+        cls: 'tb-ai-text',
+        text: `${tools.join(', ')} ${tools.length > 1 ? 'sont installés' : 'est installé'} sur cet ordinateur. `
+          + 'Ouvrez ce coffre dans Claude Code ou Codex et dites « nouveau voyage » : une courte interview, puis un programme vérifié jour par jour, '
+          + 'les fiches des lieux et un guide sur mesure, écrits directement dans vos pages.',
+      });
+      const act = body.createDiv('tb-ai-actions');
+      U.button(act, '📖 Documentation des skills IA', 'mod-cta tb-btn-sm', () => TBAi.openDocs(this.plugin));
+      U.button(act, 'Masquer', 'tb-btn-link', async () => { s.display.aiPromo = false; await this.plugin.saveSettings(); });
+    }
+
     /* ---- journée en cours */
     const day = d.currentDay();
     const prog = d.programmeFor(day);

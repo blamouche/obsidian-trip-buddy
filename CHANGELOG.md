@@ -8,6 +8,15 @@ Chaque version publiée est disponible en téléchargement, prête à ouvrir dan
 
 ## [Non publié]
 
+### Ajouté
+- Accueil : encart « Trip Buddy fonctionne super bien avec l'IA » quand Claude (application ou Claude Code) ou ChatGPT (application ou Codex) est installé sur l'ordinateur, avec un lien vers la documentation des skills. Détection locale uniquement ; masquable.
+- **Skills IA pour Claude et ChatGPT / Codex** : les skills `travel-context` et `travel-planner` suivent le format ouvert *Agent Skills* et sont aussi livrés dans `.agents/skills` (lu par Codex), avec un `AGENTS.md` qui renvoie aux consignes du coffre. Chaque version publie un zip par skill à importer dans ChatGPT ou Claude.
+- La mise à jour depuis les réglages tient à jour les deux dossiers de skills ; au démarrage, un skill livré absent de `.agents/skills` y est recopié.
+
+### Modifié
+- Skills rédigés indépendamment de l'agent : questions à choix, sous-agents et chemins des scripts décrits pour Claude Code comme pour Codex, et mode « sans accès au coffre » pour `travel-context`.
+- `check.py` ignore aussi `.agents`.
+
 ## [1.4.0] - 2026-11-23
 
 ### Ajouté

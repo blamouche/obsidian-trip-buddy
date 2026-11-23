@@ -38,7 +38,7 @@ class TripBuddySettingTab extends PluginSettingTab {
         links.createDiv({
           cls: 'setting-item-description',
           text: u.bundle
-            ? 'Met à jour le module Trip Buddy et les skills IA (.claude/skills). Vos notes, documents, journal, budget et réglages ne sont pas modifiés.'
+            ? 'Met à jour le module Trip Buddy et les skills IA (Claude et ChatGPT / Codex). Vos notes, documents, journal, budget et réglages ne sont pas modifiés.'
             : 'Cette version ne propose pas de mise à jour automatique : remplacez le dossier .obsidian/plugins/trip-buddy de ce coffre par celui du paquet, puis désactivez / réactivez Trip Buddy. Vos notes et vos réglages sont conservés.',
         });
         if (!u.bundle && u.download) links.createEl('a', { text: 'Télécharger le paquet', href: u.download });
@@ -240,6 +240,9 @@ class TripBuddySettingTab extends PluginSettingTab {
     new Setting(c).setName('Saisie rapide (journal, accueil, programmes, idées, « Mes notes » des lieux)')
       .setDesc('En mode lecture, affiche une zone de texte sous chaque section des entrées de journal, des « Notes rapides » de l’accueil et de la section « Mes notes » des fiches de lieux, pour ajouter, modifier ou supprimer du texte et des photos sans passer en mode édition. Dans les fiches de lieux, tout le texte se modifie ou se supprime ; l’ajout se fait dans « Mes notes ».')
       .addToggle((t) => t.setValue(!!disp.journalQuickAdd).onChange((v) => { disp.journalQuickAdd = v; this.save(); }));
+    new Setting(c).setName('Encart « Trip Buddy + IA » sur l’accueil')
+      .setDesc('Quand Claude (application ou Claude Code) ou ChatGPT (application ou Codex) est installé sur cet ordinateur, l’accueil présente les skills IA de planification, avec un lien vers leur documentation. Détection locale uniquement, rien n’est envoyé.')
+      .addToggle((t) => t.setValue(disp.aiPromo !== false).onChange((v) => { disp.aiPromo = v; this.save(); }));
     new Setting(c).setName('Aide visuelle')
       .setDesc('Affiche de petites aides à côté de chaque zone des pages du voyage : ce qui s’y règle, avec un lien direct vers la bonne section de ces réglages. Aussi : bouton 💡 à côté du thème sur l’accueil, ou commande « Afficher / masquer l’aide visuelle ».')
       .addToggle((t) => t.setValue(!!disp.helpMode).onChange((v) => { disp.helpMode = v; this.save(); }));

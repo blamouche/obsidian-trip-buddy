@@ -211,6 +211,7 @@ const DEFAULT_SETTINGS = {
     hideProperties: true, // masque le bloc « Propriétés » en tête des notes
     hideInlineTitle: false, // masque le titre affiché en haut des notes
     updateBanner: true, // panneau « nouvelle version » au-dessus du menu principal
+    aiPromo: true, // encart « Trip Buddy + IA » sur l'accueil quand Claude ou ChatGPT est installé
     helpMode: false, // aide visuelle : encadrés explicatifs en tête des blocs (bouton 💡 de l'accueil)
     journalQuickAdd: true, // zone de saisie sous chaque section du journal (mode lecture)
     pageWidth: 'wide', // largeur des pages du voyage : normal | wide | full
@@ -658,7 +659,7 @@ const ICONS = {
   '📝': 'notebook-pen|file-pen-line|pencil', '📎': 'paperclip', '📌': 'map-pin-plus|map-pin', '＋': 'plus', '↺': 'rotate-ccw',
   '🐙': 'github|git-branch', '🏷️': 'tag', '🆕': 'circle-fading-arrow-up|refresh-ccw-dot|refresh-cw', '⬇️': 'download',
   '🙈': 'eye-off', '👁': 'eye', '⬆️': 'upload', '📥': 'cloud-download|download-cloud|download', '💾': 'save', '🎉': 'party-popper|sparkles', '⏳': 'hourglass|loader',
-  '⚠️': 'triangle-alert|alert-triangle', '⚠︎': 'triangle-alert|alert-triangle', '💡': 'lightbulb', '📖': 'book-open',
+  '⚠️': 'triangle-alert|alert-triangle', '⚠︎': 'triangle-alert|alert-triangle', '💡': 'lightbulb', '🤖': 'bot|sparkles', '📖': 'book-open',
   '⏱️': 'clock', '🎟️': 'ticket', '🚗': 'car', '🧳': 'luggage|briefcase', '✅': 'circle-check|check-circle-2',
   '🎨': 'palette', '🌙': 'moon', '📓': 'notebook|book', '🖋️': 'pen-tool', '😀': 'smile', '↔️': 'move-horizontal',
   '🧹': 'eraser|trash', '📊': 'bar-chart-3', '🎬': 'film', '🎫': 'ticket', '🗂️': 'folders|folder',
@@ -2179,14 +2180,15 @@ const TBOfflineLayer = L.TileLayer.extend({
  * Chaque version publie, à côté du coffre zippé, un paquet de mise à jour
  * « trip-buddy-update-vX.Y.Z.json » : { format: 1, version, files: [{ path, size, sha256, data }] }
  *   path « plugin/… » → dossier du module (.obsidian/plugins/trip-buddy/…)
- *   path « skills/… » → .claude/skills/…  (data : contenu en base64)
+ *   path « skills/… » → .claude/skills/… (Claude Code) ET .agents/skills/… (Codex, format ouvert Agent Skills)
+ *   (data : contenu en base64)
  *
- * Périmètre : le dossier du module (sauf data.json) et, dans .claude/skills, les seuls dossiers
- * de skills livrés. Les notes, documents, trip-buddy.json et les autres skills ne sont jamais touchés.
+ * Périmètre : le dossier du module (sauf data.json) et, dans .claude/skills et .agents/skills, les seuls
+ * dossiers de skills livrés. Les notes, documents, trip-buddy.json et les autres skills ne sont jamais touchés.
  * Avant d'écrire, l'ancienne version est copiée dans .trash/trip-buddy-<version>-<date>/ ;
  * en cas d'erreur pendant l'écriture, elle est remise en place.
  * ========================================================================== */
-const UPDATE_SKILLS_DIR = '.claude/skills';
+const UPDATE_SKILLS_DIRS = ['.claude/skills', '.agents/skills']; // Claude Code · Codex / ChatGPT (Agent Skills)
 const UPDATE_KEEP = ['data.json']; // fichiers du module propres à l'appareil, jamais remplacés
 
 class TBUpdater {
@@ -2197,7 +2199,13 @@ class TBUpdater {
     this.pluginDir = String(pluginDir).replace(/\/+$/, '');
   }
 
-  /** Chemin du coffre pour une entrée du paquet ; refuse tout chemin qui sortirait du périmètre */
+  /** Chemins du coffre pour une entrée du paquet (un skill est écrit dans chaque dossier de skills) */
+  targets(path) {
+    const t = this.target(path);
+    return Array.isArray(t) ? t : [t];
+  }
+
+  /** Chemin(s) du coffre pour une entrée du paquet ; refuse tout chemin qui sortirait du périmètre */
   target(path) {
     const i = String(path).indexOf('/');
     const root = path.slice(0, i);
@@ -2209,7 +2217,7 @@ class TBUpdater {
     }
     if (root === 'skills') {
       if (!rel.includes('/')) throw new Error(`chemin refusé : ${path}`); // toujours dans un dossier de skill
-      return `${UPDATE_SKILLS_DIR}/${rel}`;
+      return UPDATE_SKILLS_DIRS.map((d) => `${d}/${rel}`);
     }
     throw new Error(`chemin refusé : ${path}`);
   }
@@ -2265,12 +2273,12 @@ class TBUpdater {
     }
     const files = [];
     for (const f of bundle.files) {
-      const path = this.target(f.path);
+      const paths = this.targets(f.path);
       const bytes = TBUpdater.decode(f.data || '');
       if (bytes.length !== f.size) throw new Error(`fichier tronqué : ${f.path}`);
       const h = await TBUpdater.sha256(bytes);
       if (h && f.sha256 && h !== f.sha256) throw new Error(`empreinte incorrecte : ${f.path}`);
-      files.push({ path, bytes });
+      paths.forEach((path) => files.push({ path, bytes }));
     }
     const has = (p) => files.some((f) => f.path === `${this.pluginDir}/${p}`);
     if (!has('main.js') || !has('manifest.json')) throw new Error('paquet incomplet (main.js / manifest.json)');
@@ -2283,7 +2291,7 @@ class TBUpdater {
 
     // fichiers actuellement en place dans le périmètre (module + skills livrés)
     const skillDirs = [...new Set(files.map((f) => f.path)
-      .filter((p) => p.startsWith(UPDATE_SKILLS_DIR + '/'))
+      .filter((p) => UPDATE_SKILLS_DIRS.some((d) => p.startsWith(d + '/')))
       .map((p) => p.split('/').slice(0, 3).join('/')))];
     const keep = new Set(UPDATE_KEEP.map((k) => `${this.pluginDir}/${k}`));
     const old = [];
@@ -2313,6 +2321,24 @@ class TBUpdater {
     }
     return { written: files.length, removed, backup };
   }
+
+  /** Coffres mis à jour par une version qui n'écrivait que .claude/skills : recopie dans .agents/skills
+   *  (Codex / ChatGPT) chaque skill livré qui y manque. Ne remplace jamais un skill déjà présent. */
+  static async mirrorMissingSkills(adapter, names) {
+    const [src, dst] = UPDATE_SKILLS_DIRS;
+    const up = new TBUpdater(adapter, '.');
+    let copied = 0;
+    for (const name of names) {
+      if (!(await adapter.exists(`${src}/${name}/SKILL.md`)) || (await adapter.exists(`${dst}/${name}`))) continue;
+      for (const p of await up.listFiles(`${src}/${name}`)) {
+        if (/(^|\/)(\.DS_Store|__pycache__)(\/|$)/.test(p)) continue;
+        await up.put(dst + p.slice(src.length), await adapter.readBinary(p));
+      }
+      copied++;
+    }
+    return copied;
+  }
+
 }
 
 
@@ -4294,6 +4320,75 @@ emojiPalette.lum = function ([r, g, b]) {
 };
 
 /* ==========================================================================
+ * Trip Buddy — détection des assistants IA installés (Claude, ChatGPT / Codex)
+ *
+ * Sert à l'encart « Trip Buddy + IA » de l'accueil. Vérification uniquement LOCALE : on regarde si
+ * des applications, commandes ou dossiers de configuration connus existent sur cet ordinateur.
+ * Rien n'est envoyé nulle part. Obsidian mobile : pas d'accès au système de fichiers → rien détecté.
+ * ========================================================================== */
+const TBAi = {
+  /** { claude: [libellés trouvés], chatgpt: [libellés trouvés] } ; calculé une fois par session */
+  detect() {
+    if (TBAi.cache) return TBAi.cache;
+    const found = { claude: new Set(), chatgpt: new Set() };
+    try {
+      if (!obsidian.Platform || !obsidian.Platform.isDesktopApp) throw new Error('mobile');
+      const fs = require('fs');
+      const path = require('path');
+      const os = require('os');
+      const home = os.homedir();
+      const env = process.env || {};
+      const win = process.platform === 'win32';
+      const exists = (p) => { try { return !!p && fs.existsSync(p); } catch (e) { return false; } };
+      const dirHas = (dir, re) => { try { return fs.readdirSync(dir).some((n) => re.test(n)); } catch (e) { return false; } };
+
+      // applications de bureau
+      const apps = [
+        ['claude', 'Claude', ['/Applications/Claude.app', path.join(home, 'Applications/Claude.app'),
+          env.LOCALAPPDATA && path.join(env.LOCALAPPDATA, 'AnthropicClaude'), env.LOCALAPPDATA && path.join(env.LOCALAPPDATA, 'Programs', 'Claude')]],
+        ['chatgpt', 'ChatGPT', ['/Applications/ChatGPT.app', path.join(home, 'Applications/ChatGPT.app'),
+          env.LOCALAPPDATA && path.join(env.LOCALAPPDATA, 'Programs', 'ChatGPT')]],
+        ['chatgpt', 'Codex', ['/Applications/Codex.app', path.join(home, 'Applications/Codex.app')]],
+      ];
+      apps.forEach(([k, label, list]) => { if (list.some(exists)) found[k].add(label); });
+      if (win && env.LOCALAPPDATA && dirHas(path.join(env.LOCALAPPDATA, 'Packages'), /^OpenAI\.ChatGPT/i)) found.chatgpt.add('ChatGPT');
+
+      // agents en ligne de commande (Obsidian lancé depuis le Dock n'a pas tout le PATH : dossiers usuels ajoutés)
+      const dirs = new Set(String(env.PATH || '').split(path.delimiter).filter(Boolean));
+      ['/opt/homebrew/bin', '/usr/local/bin', '/usr/bin', path.join(home, '.local/bin'), path.join(home, '.npm-global/bin'),
+        path.join(home, '.bun/bin'), path.join(home, '.volta/bin'), path.join(home, '.claude/local'),
+        env.APPDATA && path.join(env.APPDATA, 'npm')].forEach((d) => d && dirs.add(d));
+      const onPath = (name) => [...dirs].some((d) => (win ? ['.exe', '.cmd', ''] : ['']).some((ext) => exists(path.join(d, name + ext))));
+      if (onPath('claude') || exists(path.join(home, '.claude'))) found.claude.add('Claude Code');
+      if (onPath('codex') || exists(path.join(home, '.codex'))) found.chatgpt.add('Codex');
+    } catch (e) {
+      /* mobile ou accès refusé : rien de détecté */
+    }
+    TBAi.cache = { claude: [...found.claude], chatgpt: [...found.chatgpt] };
+    return TBAi.cache;
+  },
+
+  any() {
+    const d = TBAi.detect();
+    return d.claude.length > 0 || d.chatgpt.length > 0;
+  },
+
+  /** Ouvre la documentation des skills : section « Skills IA » du README du coffre (sinon sur GitHub) */
+  async openDocs(plugin) {
+    const app = plugin.app;
+    const readme = app.vault.getAbstractFileByPath('README.md');
+    if (readme instanceof TFile) {
+      const cache = app.metadataCache.getFileCache(readme);
+      const h = cache && (cache.headings || []).find((x) => /skills ia/i.test(x.heading));
+      const leaf = app.workspace.getLeaf(false);
+      await leaf.openFile(readme, h ? { eState: { line: h.position.start.line } } : {});
+      return;
+    }
+    window.open(`${REPO_URL}#-skills-ia--préparer-le-voyage-avec-claude-ou-chatgpt`);
+  },
+};
+
+/* ==========================================================================
  * Trip Buddy — socle des blocs ```tripbuddy-*``` + blocs POI
  * ========================================================================== */
 class TBBlock {
@@ -6134,6 +6229,25 @@ class DashboardBlock extends TBBlock {
       U.button(act, 'Masquer ce message', 'tb-btn-link', async () => { s.demo = false; await this.plugin.saveSettings(); });
     }
 
+    /* ---- assistants IA détectés sur cet ordinateur : encart « Trip Buddy + IA » */
+    if (s.display.aiPromo !== false && TBAi.any()) {
+      const ai = TBAi.detect();
+      const card = r.createDiv('tb-card tb-ai-card');
+      card.createDiv({ cls: 'tb-ai-ico', text: '🤖' });
+      const body = card.createDiv('tb-ai-body');
+      body.createDiv({ cls: 'tb-ai-title', text: 'Trip Buddy fonctionne super bien avec l’IA' });
+      const tools = [...ai.claude, ...ai.chatgpt];
+      body.createDiv({
+        cls: 'tb-ai-text',
+        text: `${tools.join(', ')} ${tools.length > 1 ? 'sont installés' : 'est installé'} sur cet ordinateur. `
+          + 'Ouvrez ce coffre dans Claude Code ou Codex et dites « nouveau voyage » : une courte interview, puis un programme vérifié jour par jour, '
+          + 'les fiches des lieux et un guide sur mesure, écrits directement dans vos pages.',
+      });
+      const act = body.createDiv('tb-ai-actions');
+      U.button(act, '📖 Documentation des skills IA', 'mod-cta tb-btn-sm', () => TBAi.openDocs(this.plugin));
+      U.button(act, 'Masquer', 'tb-btn-link', async () => { s.display.aiPromo = false; await this.plugin.saveSettings(); });
+    }
+
     /* ---- journée en cours */
     const day = d.currentDay();
     const prog = d.programmeFor(day);
@@ -6787,6 +6901,7 @@ const HELP_SPOTS = {
       { at: '.tb-hero', pos: 'after', text: 'En-tête : nom, destination, dates, voyageurs ; le dégradé reprend les couleurs de l’emoji du voyage', links: ['trip'] },
       { at: '.tb-hero', pos: 'after', text: 'Thème 🎨 / 🌙, pictogrammes et largeur des pages ; accueil ouvert au démarrage', links: ['display', 'startup'] },
       { at: '.tb-tiles', pos: 'after', text: 'Tuiles : chacune ouvre la page de sa rubrique', links: ['folders'] },
+      { at: '.tb-ai-card', pos: 'after', text: 'Encart IA : affiché quand Claude ou ChatGPT est installé ; à masquer ici', links: ['display'] },
       { at: '.tb-dash-day', pos: 'before', text: 'Journée du jour : les journées suivent les dates du voyage', links: ['trip'] },
       { at: '.tb-dash-map', pos: 'before', text: 'Carte : fond, centre et zoom, traces GPX, cartes hors ligne, transports en commun', links: ['map', 'offline', 'transit'] },
     ],
@@ -9553,7 +9668,7 @@ class TripBuddySettingTab extends PluginSettingTab {
         links.createDiv({
           cls: 'setting-item-description',
           text: u.bundle
-            ? 'Met à jour le module Trip Buddy et les skills IA (.claude/skills). Vos notes, documents, journal, budget et réglages ne sont pas modifiés.'
+            ? 'Met à jour le module Trip Buddy et les skills IA (Claude et ChatGPT / Codex). Vos notes, documents, journal, budget et réglages ne sont pas modifiés.'
             : 'Cette version ne propose pas de mise à jour automatique : remplacez le dossier .obsidian/plugins/trip-buddy de ce coffre par celui du paquet, puis désactivez / réactivez Trip Buddy. Vos notes et vos réglages sont conservés.',
         });
         if (!u.bundle && u.download) links.createEl('a', { text: 'Télécharger le paquet', href: u.download });
@@ -9755,6 +9870,9 @@ class TripBuddySettingTab extends PluginSettingTab {
     new Setting(c).setName('Saisie rapide (journal, accueil, programmes, idées, « Mes notes » des lieux)')
       .setDesc('En mode lecture, affiche une zone de texte sous chaque section des entrées de journal, des « Notes rapides » de l’accueil et de la section « Mes notes » des fiches de lieux, pour ajouter, modifier ou supprimer du texte et des photos sans passer en mode édition. Dans les fiches de lieux, tout le texte se modifie ou se supprime ; l’ajout se fait dans « Mes notes ».')
       .addToggle((t) => t.setValue(!!disp.journalQuickAdd).onChange((v) => { disp.journalQuickAdd = v; this.save(); }));
+    new Setting(c).setName('Encart « Trip Buddy + IA » sur l’accueil')
+      .setDesc('Quand Claude (application ou Claude Code) ou ChatGPT (application ou Codex) est installé sur cet ordinateur, l’accueil présente les skills IA de planification, avec un lien vers leur documentation. Détection locale uniquement, rien n’est envoyé.')
+      .addToggle((t) => t.setValue(disp.aiPromo !== false).onChange((v) => { disp.aiPromo = v; this.save(); }));
     new Setting(c).setName('Aide visuelle')
       .setDesc('Affiche de petites aides à côté de chaque zone des pages du voyage : ce qui s’y règle, avec un lien direct vers la bonne section de ces réglages. Aussi : bouton 💡 à côté du thème sur l’accueil, ou commande « Afficher / masquer l’aide visuelle ».')
       .addToggle((t) => t.setValue(!!disp.helpMode).onChange((v) => { disp.helpMode = v; this.save(); }));
@@ -10500,6 +10618,12 @@ class TripBuddyPlugin extends Plugin {
       },
     });
 
+    // skills pour Codex / ChatGPT (.agents/skills) absents d'un coffre mis à jour par une ancienne version
+    this.app.workspace.onLayoutReady(() => {
+      TBUpdater.mirrorMissingSkills(this.app.vault.adapter, ['travel-context', 'travel-planner'])
+        .then((n) => { if (n) console.info(`[Trip Buddy] ${n} skill(s) recopié(s) dans .agents/skills`); })
+        .catch((e) => console.error('[Trip Buddy] skills', e));
+    });
     this.app.workspace.onLayoutReady(() => {
       if (this.settings.openHomeOnStartup) this.openHomeOnStartup();
       // rouvre l'accueil quand le dernier onglet est fermé
@@ -10758,7 +10882,7 @@ class TripBuddyPlugin extends Plugin {
       const j = r.json || {};
       const latest = String(j.tag_name || '').replace(/^v/, '');
       if (!latest) throw new Error('réponse inattendue');
-      const asset = (j.assets || []).find((a) => /\.zip$/i.test(a.name));
+      const asset = (j.assets || []).find((a) => /^trip-buddy-v.*\.zip$/i.test(a.name)) || (j.assets || []).find((a) => /\.zip$/i.test(a.name) && !/skill/i.test(a.name));
       const bundle = (j.assets || []).find((a) => /^trip-buddy-update.*\.json$/i.test(a.name));
       res = {
         ok: true, current, latest, newer: U.semverCmp(latest, current) > 0,
@@ -10829,7 +10953,7 @@ class TripBuddyPlugin extends Plugin {
       return;
     }
     new ConfirmModal(this, `⬇️ Mettre à jour Trip Buddy en ${u.latest} ?`,
-      `La mise à jour remplace le module Trip Buddy (${this.manifest.dir}) et les skills IA livrés (.claude/skills/travel-context, travel-planner) par ceux de la version ${u.latest}. `
+      `La mise à jour remplace le module Trip Buddy (${this.manifest.dir}) et les skills IA livrés (travel-context, travel-planner, dans .claude/skills et .agents/skills) par ceux de la version ${u.latest}. `
       + 'Vos notes, documents, journal, budget, valise, guide, CONTEXT.md et réglages (trip-buddy.json) ne sont pas modifiés. '
       + `La version actuelle (${this.manifest.version}) est copiée dans la corbeille du coffre (.trash) avant d’être remplacée. Le module se recharge à la fin.`,
       'Mettre à jour', async () => {

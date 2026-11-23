@@ -21,13 +21,13 @@ La propriété `category` prend l'**identifiant** d'une catégorie des réglages
 1. Écrire la fiche avec `lat:` et `lon:` vides.
 2. Dès que les fiches du lot sont écrites, les géolocaliser en une commande (depuis la racine du coffre) :
    ```bash
-   python3 .claude/skills/travel-planner/scripts/geocode.py --vault . --only "Nom 1" "Nom 2" "Nom 3"
+   python3 <skill>/scripts/geocode.py --vault . --only "Nom 1" "Nom 2" "Nom 3"
    ```
    Le script interroge OpenStreetMap (Nominatim) et écrit `lat`/`lon` dans chaque fiche. Il partage un verrou avec les autres agents : plusieurs lots peuvent tourner en même temps sans dépasser la limite d'une requête par seconde (il suffit d'attendre).
 3. **Contrôler chaque résultat** affiché : le libellé renvoyé doit correspondre au lieu (bon nom ou bonne adresse, bonne ville). Un résultat qui tombe sur la mauvaise rue, une autre ville, ou signalé « ⚠ à N km des autres lieux » (hors excursion prévue) est faux.
 4. Pour chaque échec ou résultat faux : trouver les coordonnées exactes de l'entrée du lieu (site officiel, Wikipédia, OpenStreetMap) et les écrire avec :
    ```bash
-   python3 .claude/skills/travel-planner/scripts/geocode.py --vault . --set "Nom du lieu" 37.377200 -5.986900
+   python3 <skill>/scripts/geocode.py --vault . --set "Nom du lieu" 37.377200 -5.986900
    ```
    Pour un lieu étendu (parc, quartier, plage), viser l'entrée principale ou la place centrale.
 5. Ne rendre la main que lorsque **toutes** les fiches du lot ont des coordonnées vérifiées.
@@ -37,7 +37,7 @@ La propriété `category` prend l'**identifiant** d'une catégorie des réglages
 1. Chercher sur **Wikimedia Commons** une photo représentative sous licence libre (CC BY, CC BY-SA, CC0, domaine public).
 2. La télécharger avec le script fourni, qui ne télécharge que depuis Wikimedia et affiche le crédit :
    ```bash
-   python3 .claude/skills/travel-planner/scripts/commons_photo.py --vault . "File:<nom du fichier sur Commons>" "<Nom exact du lieu>"
+   python3 <skill>/scripts/commons_photo.py --vault . "File:<nom du fichier sur Commons>" "<Nom exact du lieu>"
    ```
 3. Copier dans la fiche les deux lignes qu'il affiche (`photo:` et `photo_credit:`).
 Pas de photo trouvée ou pas d'autorisation : ne pas mettre les propriétés `photo` / `photo_credit`.

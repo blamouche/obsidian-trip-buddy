@@ -5,6 +5,7 @@
 #   ex. 1.2.0 dist dev.42-abc1234 → paquet de développement (contenu de main, pas encore publié)
 # Produit : <sortie>/trip-buddy-v<version>[-<étiquette>].zip (dossier « Trip Buddy » à l'intérieur)
 #           <sortie>/trip-buddy-update-v<version>[-<étiquette>].json (module + skills, pour la mise à jour depuis les réglages)
+#           <sortie>/trip-buddy-skill-<nom>-v<version>[-<étiquette>].zip (un skill, à importer dans ChatGPT ou Claude)
 #           <sortie>/release-notes.md (section du CHANGELOG : la version, ou « Non publié » en développement)
 set -eu
 VERSION="${1:?Version attendue, ex. 1.2.0}"
@@ -20,6 +21,9 @@ fail() { echo "❌ $*" >&2; exit 1; }
 MANIFEST_VERSION="$(sed -n 's/.*"version": *"\([^"]*\)".*/\1/p' "$PLUGIN/manifest.json" | head -1)"
 [ "$MANIFEST_VERSION" = "$VERSION" ] || fail "manifest.json est en $MANIFEST_VERSION, version demandée $VERSION"
 grep -q "^## \[$VERSION\]" CHANGELOG.md || fail "CHANGELOG.md n'a pas de section « ## [$VERSION] »"
+
+# 1 bis. les skills pour Codex / ChatGPT (.agents/skills) doivent être la copie exacte de .claude/skills
+sh "$ROOT/.github/scripts/sync-skills.sh" --check
 
 # 2. le module compilé doit correspondre aux sources commitées
 sh "$PLUGIN/build.sh" >/dev/null
@@ -70,6 +74,12 @@ json.dump({'format': 1, 'name': 'trip-buddy', 'version': version,
            'files': files}, open(out, 'w'), separators=(',', ':'))
 print(f'   + {os.path.basename(out)} : {len(files)} fichiers')
 PY
+# un zip par skill (dossier du skill à la racine du zip) : import dans ChatGPT (Skills) ou Claude (Capacités)
+for d in "$STAGE/Trip Buddy/.claude/skills"/*/; do
+  n="$(basename "$d")"
+  (cd "$STAGE/Trip Buddy/.claude/skills" && zip -rqX "$OUT/trip-buddy-skill-$n-v$VERSION${LABEL:+-$LABEL}.zip" "$n" -x '*.DS_Store' '*__pycache__*')
+  echo "   + trip-buddy-skill-$n-v$VERSION${LABEL:+-$LABEL}.zip"
+done
 rm -rf "$STAGE"
 
 # 4. notes de version = section du CHANGELOG
@@ -96,6 +106,9 @@ cat >> "$OUT/release-notes.md" <<NOTES
 3. À la question d'Obsidian, cliquez **Faire confiance à l'auteur et activer les plugins** : l'accueil du voyage s'ouvre.
 
 Le coffre contient un voyage d'exemple fictif ; pour partir de zéro : commande *Trip Buddy : Vider les données d'exemple (nouveau voyage)*.
+
+### 🤖 Skills IA (Claude, ChatGPT / Codex)
+Les skills de planification sont déjà dans le coffre : \`.claude/skills\` pour Claude Code, \`.agents/skills\` pour Codex. Pour les importer séparément dans ChatGPT ou Claude, utilisez les fichiers **trip-buddy-skill-…zip** ci-dessous.
 NOTES
 
 echo "✅ $ZIP ($(du -h "$ZIP" | cut -f1))"

@@ -30,7 +30,7 @@ Il rassemble dans un seul coffre : les lieux à voir (POI géocodés), une carte
 
 **Mettre à jour** : quand une nouvelle version est publiée, un **panneau 🆕 au-dessus du menu principal** l'annonce sur toutes les pages (bouton **⬇️ Mettre à jour**, lien *Nouveautés*, ✕ pour le masquer jusqu'à la version suivante ; désactivable dans *Réglages → Affichage des notes*). Le numéro de version et l'état des mises à jour sont aussi affichés en haut de **Réglages → Trip Buddy**. La mise à jour remplace, après confirmation :
 - le module Trip Buddy (`.obsidian/plugins/trip-buddy`, sauf `data.json`) ;
-- les skills IA livrés (`.claude/skills/travel-context` et `travel-planner`) — vos autres skills ne sont pas touchés.
+- les skills IA livrés (`travel-context` et `travel-planner`, dans `.claude/skills` pour Claude et `.agents/skills` pour ChatGPT / Codex) — vos autres skills ne sont pas touchés.
 
 Les **contenus ne sont jamais modifiés** : notes, documents, journal, budget, valise, guide, `CONTEXT.md`, réglages (`trip-buddy.json`). Chaque fichier téléchargé est vérifié (taille et empreinte SHA-256) avant toute écriture ; la version en place est d'abord copiée dans la corbeille du coffre (`.trash/trip-buddy-<version>-<date>/`) et remise en place si l'écriture échoue. Le module se recharge tout seul à la fin. La mise à jour automatique est disponible à partir de la 1.2.0 ; pour une version plus ancienne, remplacez à la main le dossier `.obsidian/plugins/trip-buddy` (et `.claude/skills`) par ceux du paquet, puis désactivez / réactivez Trip Buddy.
 
@@ -48,7 +48,7 @@ Deux icônes sont ajoutées dans le ruban de gauche : 🗺️ **carte du voyage*
    - **tout le contenu** des dossiers Documents, Journal, POI, Programme et Guide est effacé : billets, PDF, photos, traces GPX, entrées de journal, programmes, fiches de lieux (même sans propriété `type`), pages de guide ajoutées ; les sous-dossiers devenus vides aussi. Seules les pages d'accueil des rubriques (Documents, Journal, Index des POI, Programme, Guide) et les modèles restent ;
    - le tableau des dépenses est vidé et la valise entièrement décochée ;
    - les pages de base du guide repartent d'un squelette vierge et les sections libres propres au voyage (*Notes rapides* de l'accueil, *Idées en vrac* du programme) sont vidées, en gardant intertitres et en-têtes de tableau (une copie de chaque page modifiée passe par `.trash`, qui est vidée ensuite) ;
-   - le contexte du voyage (`CONTEXT.md`) et le dossier de travail `.trip-planner`, créés par les skills Claude `travel-context` et `travel-planner`, sont effacés aussi ;
+   - le contexte du voyage (`CONTEXT.md`) et le dossier de travail `.trip-planner`, créés par les skills IA `travel-context` et `travel-planner`, sont effacés aussi ;
    - les réseaux de transports en commun sont retirés (fichiers dans `.trash`, liste des réglages vidée) et les cartes hors ligne **de cet appareil** sont supprimées (elles sont stockées par appareil : sur un autre appareil, utiliser *Tout supprimer* dans les réglages des cartes hors ligne) ;
    - le voyage est renommé **« My trip »** avec l'emoji 🧳, ses participants, sa destination, ses dates, son budget et les budgets par catégorie sont remis à zéro, la couverture du carnet oubliée (devise et autres réglages conservés).
    - **enfin, la corbeille du coffre `.trash` est vidée définitivement** (si elle ne peut pas l'être, le message l'indique et les fichiers y restent).
@@ -82,6 +82,7 @@ La **barre de navigation** en haut de chaque page (bloc `tripbuddy-nav`) mène a
 ## 🏠 Accueil (tableau de bord)
 - **En-tête** : emoji, destination, nom et dates du voyage (nombre de jours), statut (à venir / en cours / terminé), avatars des voyageurs, accès aux réglages ⚙️ et sélecteur de thème 🎨 / 🌙. Le **dégradé de fond reprend les couleurs de l'emoji du voyage** (🇮🇹 rouge → vert, 🌸 rose, ✈️ bleu…), assombries pour que le texte reste lisible, et en version plus sombre avec le thème 🌙 ; un emoji sans couleur (⚫, 🐘…) garde le dégradé par défaut.
 - **Bandeau « Voyage d'exemple »** (tant que `demo` vaut `true` dans `trip-buddy.json`, c'est le cas du coffre téléchargé) : rappelle que le voyage est fictif, avec un bouton **🧹 Repartir de zéro** qui ouvre directement la section *Préparer un nouveau voyage* des réglages. *Masquer ce message* le retire sans rien effacer ; *Vider les données d'exemple* le retire aussi.
+- **Encart « Trip Buddy fonctionne super bien avec l'IA »** : affiché quand Claude (application ou Claude Code) ou ChatGPT (application ou Codex) est installé sur l'ordinateur, avec un lien vers la [[#🤖 Skills IA — préparer le voyage avec Claude ou ChatGPT|documentation des skills]]. Détection **locale uniquement** (présence des applications, commandes ou dossiers de configuration), rien n'est envoyé ; jamais sur mobile. *Masquer* le retire (réglage *Affichage des notes*).
 - **💡 Aide visuelle** (bouton à gauche du choix du thème 🎨 / 🌙) : affiche de **petites aides d'une ligne à côté de chaque zone** des pages du voyage (en-tête, tuiles, carte, catégories, budget par catégorie, actions d'une fiche…) : ce qui s'y règle, avec un **lien direct vers la bonne section des réglages**, et sous chaque bloc ses options. *Masquer l'aide* (sous le menu), le même bouton ou la commande *Afficher / masquer l'aide visuelle* la retire.
 - **Tuiles** avec progression : jours planifiés, lieux géolocalisés, lieux faits, jours écrits dans le journal, budget dépensé / prévu, valise prête (%), nombre de documents. Ctrl/Cmd + clic ouvre dans un nouvel onglet.
 - **Journée en cours** (aujourd'hui pendant le voyage, sinon le prochain jour ou le premier) : étapes du programme, boutons ✍️ Journal et 💸 Dépense, ou 🗓️ *Planifier la journée* si rien n'est prévu.
@@ -276,6 +277,19 @@ Bouton **📄 Exporter le voyage** de la page Documents (ou commande *Exporter l
 
 ---
 
+## 🤖 Skills IA — préparer le voyage avec Claude ou ChatGPT
+Deux skills de planification sont livrés avec le coffre, au format ouvert *Agent Skills* (le même `SKILL.md` pour Claude et pour ChatGPT / Codex) :
+1. **`travel-context`** — une interview (destination, dates, participants, goûts, centres d'intérêt…) qui écrit `CONTEXT.md`, la source de vérité du voyage.
+2. **`travel-planner`** — à partir de `CONTEXT.md` : agenda vérifié et validé jour par jour (`06 Programme`), fiches détaillées des lieux géolocalisées (`05 POI`), guide sur mesure (`08 Guide`).
+
+| Où | Comment |
+| --- | --- |
+| **Claude Code** (terminal, application de bureau, éditeur) | Ouvrir le dossier du coffre ; les skills sont lus dans `.claude/skills`, les consignes dans `CLAUDE.md`. Dire « nouveau voyage » ou « planifie le voyage », ou taper `/travel-context`. |
+| **Codex** (ChatGPT : application Codex, terminal, éditeur) | Ouvrir le dossier du coffre ; les skills sont lus dans `.agents/skills`, les consignes dans `AGENTS.md` (qui renvoie à `CLAUDE.md`). Dire « nouveau voyage » ou taper `$travel-context`. |
+| **ChatGPT** ou **Claude** dans le navigateur | Importer le skill depuis la page [Releases](https://github.com/blamouche/obsidian-trip-buddy/releases/latest) (fichiers `trip-buddy-skill-…zip` ; *Skills* dans ChatGPT, *Capacités* dans Claude, selon votre abonnement). Sans accès au coffre, `travel-context` donne le contenu de `CONTEXT.md` à copier ; `travel-planner` a besoin d'un agent qui travaille dans le dossier du coffre (Claude Code ou Codex). |
+
+`travel-planner` vérifie horaires et tarifs sur le web et lance des scripts Python (`geocode.py`, `check.py`, `commons_photo.py`). Les deux dossiers de skills contiennent les mêmes fichiers ; le bouton *Mettre à jour* des réglages les tient tous deux à jour.
+
 ## 🧩 Blocs disponibles
 Chaque page est une note Markdown normale dans laquelle on insère un bloc de code :
 
@@ -345,7 +359,7 @@ Toutes les modifications s'appliquent immédiatement à toutes les pages. Les r�
 | 🧭 **Itinéraire et « Ouvrir dans »** | Service pour les boutons *Itinéraire / Y aller* et *Ouvrir dans* : OpenStreetMap, Google Maps (à pied), ou un fournisseur personnalisé avec ses URL. Variables : `{lat}` `{lon}` `{name}` `{address}` `{query}`. Exemple Apple Plans : `https://maps.apple.com/?daddr={lat},{lon}&dirflg=w`. |
 | 🧭 **Menu principal** | Ordre des rubriques de la barre de navigation (↑ ↓, ↺ ordre par défaut) et rubriques affichées (👁 / 🙈 par rubrique, 👁 tout afficher). Une rubrique masquée disparaît seulement du menu : ses pages restent accessibles. Au moins une rubrique reste affichée. |
 | 📂 **Dossiers et pages** | Dossiers (documents, journal, POI, programmes, modèles), pages (accueil, programme, carte, index des POI, journal, budget, valise, documents) et modèles (POI, journal, programme). |
-| 🧾 **Affichage des notes** | Thème (*Par défaut* qui suit Obsidian, ou *Sombre*) ; style des pictogrammes (*Traits* : icônes fines monochromes, ou *Emoji*) ; aide visuelle (aides contextuelles, désactivée par défaut) ; panneau des mises à jour au-dessus du menu (activé par défaut) ; masquer les propriétés ; masquer le titre en haut des notes ; saisie rapide ; largeur des pages du voyage (standard, large 1 180 px, pleine largeur) ; ouvrir les notes en mode lecture ; dossier des images et fichiers collés. Ces options sont gérées par le module et réappliquées à chaque démarrage, même si la configuration d'Obsidian est réinitialisée (synchronisation…). |
+| 🧾 **Affichage des notes** | Thème (*Par défaut* qui suit Obsidian, ou *Sombre*) ; style des pictogrammes (*Traits* : icônes fines monochromes, ou *Emoji*) ; encart « Trip Buddy + IA » sur l'accueil ; aide visuelle (aides contextuelles, désactivée par défaut) ; panneau des mises à jour au-dessus du menu (activé par défaut) ; masquer les propriétés ; masquer le titre en haut des notes ; saisie rapide ; largeur des pages du voyage (standard, large 1 180 px, pleine largeur) ; ouvrir les notes en mode lecture ; dossier des images et fichiers collés. Ces options sont gérées par le module et réappliquées à chaque démarrage, même si la configuration d'Obsidian est réinitialisée (synchronisation…). |
 | ↔️ **Colonnes latérales** | Repli automatique des colonnes inactives (jamais pendant le survol ou la saisie), délai d'inactivité (secondes, minimum 2), colonnes concernées (gauche, droite ou les deux). |
 | 🏠 **Démarrage** | Ouvrir l'accueil à l'ouverture d'Obsidian ; rouvrir l'accueil quand tous les onglets sont fermés. |
 | 📥 **Cartes hors ligne** | Voir [[#📥 Cartes hors ligne|Cartes hors ligne]]. |
@@ -410,6 +424,7 @@ Sans connexion : les notes, le programme, le budget, le journal, les traces GPX,
 | `30-modals.js` · `35-emoji.js` | Géocodage et fenêtres (lieu, dépense, programme, valise…) · sélecteur d'emoji et couleurs d'un emoji (`emojiPalette`, dégradé de l'en-tête) |
 | `40-blocks-poi.js` · `41-programme.js` · `42-budget.js` · `43-modules.js` | Blocs `tripbuddy-*` |
 | `44-journal-quickadd.js` · `45-guide.js` | Saisie rapide en mode lecture · guide |
+| `38-ai.js` | Détection locale de Claude / ChatGPT (encart IA de l'accueil) et ouverture de la documentation des skills |
 | `46-help.js` | Aide visuelle : aides contextuelles par bloc et par zone (`HELP_SPOTS`), sections des réglages (`SETTINGS_SECTIONS`, ancres de `openSettings(id)`) |
 | `47-booklet.js` · `48-export.js` | Carnet A6 · export A4 |
 | `50-views.js` · `60-settings.js` · `80-sidebars.js` · `90-plugin.js` | Vue carte · réglages · repli des colonnes · plugin principal et commandes |
@@ -433,6 +448,7 @@ sh .github/scripts/release.sh 1.1.0
   Le script transforme *Non publié* en section `[1.1.0]` datée, met le numéro à jour (manifest et ce mode d'emploi), reconstruit le module, vérifie le paquet, commite « Version 1.1.0 », pose le tag `v1.1.0` et pousse. Le tag déclenche l'action GitHub *Release* (`.github/workflows/release.yml`) qui publie `trip-buddy-v1.1.0.zip` — le coffre complet, CHANGELOG compris — avec la section du CHANGELOG comme notes de version.
 - **Paquet de développement automatique** : à chaque push sur `main`, l'action *Paquet de développement* (`.github/workflows/build-main.yml`) construit `trip-buddy-vX.Y.Z-dev.N-<commit>.zip` (X.Y.Z = dernière version publiée, N = numéro du build), le garde 30 jours comme artefact du build et le publie en pré-version `dev-N`, en supprimant la précédente. Ses notes reprennent la section *Non publié* du CHANGELOG. La dernière version stable (`releases/latest`) et la vérification des mises à jour ne sont pas concernées.
 - Tester le paquet en local sans rien publier : `sh .github/scripts/package.sh <version actuelle> dist` (le dossier `dist/` est ignoré par git).
+- Les skills se modifient uniquement dans `.claude/skills` (la source) ; `sh .github/scripts/sync-skills.sh` les recopie dans `.agents/skills` (lancé aussi par `release.sh` ; le paquet est refusé si les deux diffèrent). Chaque version publie un zip par skill (`trip-buddy-skill-<nom>-vX.Y.Z.zip`) pour l'import dans ChatGPT ou Claude.
 - Chaque version publie aussi `trip-buddy-update-vX.Y.Z.json` : le module et les skills seulement (chemins `plugin/…` et `skills/…`, contenu en base64, taille et SHA-256 par fichier). C'est ce fichier qu'utilise le bouton *Mettre à jour* des réglages (`src/18-updater.js`).
 - Le paquet contient les fichiers suivis par git, sauf l'outillage du dépôt (`.github`, `.gitignore`, `.gitattributes`) : jamais `.trash`, l'état des fenêtres ni les réglages de synchronisation.
 

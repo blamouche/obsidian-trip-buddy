@@ -14,7 +14,7 @@ const ICONS = {
   '📝': 'notebook-pen|file-pen-line|pencil', '📎': 'paperclip', '📌': 'map-pin-plus|map-pin', '＋': 'plus', '↺': 'rotate-ccw',
   '🐙': 'github|git-branch', '🏷️': 'tag', '🆕': 'circle-fading-arrow-up|refresh-ccw-dot|refresh-cw', '⬇️': 'download',
   '🙈': 'eye-off', '👁': 'eye', '⬆️': 'upload', '📥': 'cloud-download|download-cloud|download', '💾': 'save', '🎉': 'party-popper|sparkles', '⏳': 'hourglass|loader',
-  '⚠️': 'triangle-alert|alert-triangle', '⚠︎': 'triangle-alert|alert-triangle', '💡': 'lightbulb', '📖': 'book-open',
+  '⚠️': 'triangle-alert|alert-triangle', '⚠︎': 'triangle-alert|alert-triangle', '💡': 'lightbulb', '🤖': 'bot|sparkles', '📖': 'book-open',
   '⏱️': 'clock', '🎟️': 'ticket', '🚗': 'car', '🧳': 'luggage|briefcase', '✅': 'circle-check|check-circle-2',
   '🎨': 'palette', '🌙': 'moon', '📓': 'notebook|book', '🖋️': 'pen-tool', '😀': 'smile', '↔️': 'move-horizontal',
   '🧹': 'eraser|trash', '📊': 'bar-chart-3', '🎬': 'film', '🎫': 'ticket', '🗂️': 'folders|folder',
