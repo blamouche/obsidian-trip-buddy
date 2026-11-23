@@ -10361,9 +10361,19 @@ class TripBuddyPlugin extends Plugin {
   /** Dernière version publiée sur GitHub (releases/latest, pré-versions exclues), mise en cache 6 h.
    *  Renvoie { ok, current, latest, newer, url, download, date } ou { ok: false, error, current }.
    *  Seul appel : api.github.com, sans aucune donnée du voyage. */
-  async checkUpdate(force) {
+  checkUpdate(force) {
+    if (!force && this.updateInfo && Date.now() - this.updateInfo.at < 6 * 3600e3) return Promise.resolve(this.updateInfo);
+    // une seule requête à la fois : les appels simultanés (plusieurs menus au démarrage, « Vérifier »)
+    // attendent la réponse de celle déjà en cours
+    if (!this.updatePending) {
+      this.updatePending = this.fetchUpdate().finally(() => { this.updatePending = null; });
+    }
+    return this.updatePending;
+  }
+
+  /** Interroge GitHub (releases/latest) ; résultat mis en cache dans this.updateInfo */
+  async fetchUpdate() {
     const now = Date.now();
-    if (!force && this.updateInfo && now - this.updateInfo.at < 6 * 3600e3) return this.updateInfo;
     const current = this.manifest.version;
     let res;
     try {
@@ -10425,22 +10435,40 @@ class TripBuddyPlugin extends Plugin {
     }
   }
 
-  /** Confirmation puis mise à jour du module et des skills (réglages et panneau au-dessus du menu) */
-  confirmUpdate(u, btn) {
+  /** Confirmation puis mise à jour du module et des skills (réglages et panneau au-dessus du menu).
+   *  La dernière version est revérifiée juste avant : le résultat affiché peut dater de quelques heures
+   *  (cache de 6 h) et une version plus récente être sortie entre-temps. */
+  async confirmUpdate(u, btn) {
     const label = btn ? btn.textContent : '';
+    const busy = (text) => { if (btn) { btn.disabled = true; btn.setText(text); } };
+    const idle = () => { if (btn) { btn.disabled = false; btn.setText(label); } };
+    busy('Vérification…');
+    const fresh = await this.checkUpdate(true);
+    idle();
+    if (fresh.ok) {
+      if (!fresh.newer) {
+        new Notice(`✅ Trip Buddy est déjà à jour (version ${fresh.current}).`);
+        this.refreshAll();
+        return;
+      }
+      u = fresh;
+    } else if (!u || !u.bundle) {
+      new Notice(`⚠️ Impossible de vérifier la dernière version : ${fresh.error}`, 8000);
+      return;
+    }
     new ConfirmModal(this, `⬇️ Mettre à jour Trip Buddy en ${u.latest} ?`,
       `La mise à jour remplace le module Trip Buddy (${this.manifest.dir}) et les skills IA livrés (.claude/skills/travel-context, travel-planner) par ceux de la version ${u.latest}. `
       + 'Vos notes, documents, journal, budget, valise, guide, CONTEXT.md et réglages (trip-buddy.json) ne sont pas modifiés. '
       + `La version actuelle (${this.manifest.version}) est copiée dans la corbeille du coffre (.trash) avant d’être remplacée. Le module se recharge à la fin.`,
       'Mettre à jour', async () => {
-        if (btn) { btn.disabled = true; btn.setText('Mise à jour en cours…'); }
+        busy('Mise à jour en cours…');
         try {
           await this.installUpdate(u);
           if (btn) btn.setText('✅ Mis à jour');
         } catch (e) {
           console.error('[Trip Buddy] mise à jour', e);
           new Notice(`⚠️ Mise à jour impossible : ${(e && e.message) || e}`, 10000);
-          if (btn) { btn.disabled = false; btn.setText(label); }
+          idle();
         }
       }).open();
   }
