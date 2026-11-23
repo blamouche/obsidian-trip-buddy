@@ -271,6 +271,7 @@
     "packing"
   ],
   "navHidden": [],
+  "demo": true,
   "autoHideSidebars": {
     "enabled": true,
     "delay": 10,

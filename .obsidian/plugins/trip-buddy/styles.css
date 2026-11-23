@@ -1180,6 +1180,12 @@ li > .tb-inline-edit { margin: 4px 0 6px; }
 .tb-doc-drop-hint { grid-column: 1 / -1; padding: 18px; text-align: center; font-size: 13px; color: var(--text-muted); border: 1px dashed var(--tb-border); border-radius: 12px; }
 
 /* ==== ACCUEIL ========================================================== */
+.tb-demo-notice { display: flex; gap: 14px; align-items: flex-start; border: 1.5px dashed color-mix(in srgb, var(--tb-accent) 55%, transparent); background: var(--tb-accent-soft); }
+.tb-demo-ico { font-size: 28px; line-height: 1; padding-top: 2px; }
+.tb-demo-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.tb-demo-title { font-weight: 800; font-size: 16px; }
+.tb-demo-text { color: var(--text-muted); font-size: 14px; line-height: 1.45; }
+.tb-demo-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 2px; }
 .tb-hero { position: relative; display: flex; gap: 18px; align-items: center; padding: 26px 24px; border-radius: 22px; margin-bottom: 14px; color: #fff; overflow: hidden;
   background: radial-gradient(circle at 85% 15%, rgba(255, 255, 255, .25), transparent 40%), linear-gradient(135deg, var(--tb-hero-c1, #0ea5e9) 0%, var(--tb-hero-c2, #6366f1) 55%, var(--tb-hero-c3, #ec4899) 100%);
   box-shadow: 0 12px 30px color-mix(in srgb, var(--tb-hero-c2, #6366f1) 30%, transparent); text-shadow: 0 1px 2px rgba(0, 0, 0, .12); }
@@ -1255,6 +1261,8 @@ li > .tb-inline-edit { margin: 4px 0 6px; }
 .tb-set-logo { font-size: 36px; }
 .tb-set-heading { margin-top: 26px; padding-bottom: 6px; border-bottom: 1px solid var(--background-modifier-border); }
 .tb-set-heading h3 { margin: 0 0 2px; }
+.tb-set-heading.is-flash { animation: tb-flash 2.2s ease-out; border-radius: 10px; }
+@keyframes tb-flash { 0%, 30% { background: var(--tb-accent-soft, rgba(124, 58, 237, .14)); box-shadow: 0 0 0 6px var(--tb-accent-soft, rgba(124, 58, 237, .14)); } 100% { background: transparent; box-shadow: 0 0 0 6px transparent; } }
 .tb-listedit { display: flex; flex-direction: column; gap: 6px; padding: 10px 0; }
 .tb-listedit-row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; padding: 6px; border-radius: 10px; background: var(--background-secondary); }
 .tb-listedit-row input[type="color"] { width: 40px; height: 32px; padding: 2px; border-radius: 8px; }

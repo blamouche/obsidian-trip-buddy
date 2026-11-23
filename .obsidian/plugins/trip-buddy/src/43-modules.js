@@ -651,6 +651,22 @@ class DashboardBlock extends TBBlock {
     tile('packing', '🎒', 'Valise', packing.total ? `${Math.round((packing.done / packing.total) * 100)} % prêt` : 'Liste vide', packing.total ? packing.done / packing.total : 0);
     tile('documents', '📁', 'Documents', `${docs} fichier${docs > 1 ? 's' : ''}`);
 
+    /* ---- voyage d'exemple : explication + accès direct à la remise à zéro */
+    if (s.demo) {
+      const demo = r.createDiv('tb-card tb-demo-notice');
+      demo.createDiv({ cls: 'tb-demo-ico', text: '🧪' });
+      const body = demo.createDiv('tb-demo-body');
+      body.createDiv({ cls: 'tb-demo-title', text: 'Voyage d’exemple' });
+      body.createDiv({
+        cls: 'tb-demo-text',
+        text: `« ${s.trip.name || 'Ce voyage'} » est un contenu de démonstration, fictif : lieux, programme, journal, budget, documents et guide servent à découvrir Trip Buddy. `
+          + 'Quand vous êtes prêt, remettez le coffre à zéro dans les réglages pour préparer votre propre voyage.',
+      });
+      const act = body.createDiv('tb-demo-actions');
+      U.button(act, '🧹 Repartir de zéro (réglages)', 'mod-cta tb-btn-sm', () => this.plugin.openSettings('reset'));
+      U.button(act, 'Masquer ce message', 'tb-btn-link', async () => { s.demo = false; await this.plugin.saveSettings(); });
+    }
+
     /* ---- journée en cours */
     const day = d.currentDay();
     const prog = d.programmeFor(day);

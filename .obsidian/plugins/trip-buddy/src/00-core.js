@@ -183,6 +183,7 @@ const DEFAULT_SETTINGS = {
   },
   navOrder: [], // ordre des rubriques du menu principal (clés de NAV_ITEMS) ; vide = ordre par défaut
   navHidden: [], // rubriques masquées dans le menu principal (clés de NAV_ITEMS)
+  demo: false, // le coffre contient le voyage d'exemple : bandeau d'explication sur l'accueil (remis à false par « Vider les données d'exemple »)
   autoHideSidebars: {
     enabled: true,
     delay: 10, // secondes sans interaction avant de replier une colonne

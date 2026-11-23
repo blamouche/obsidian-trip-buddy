@@ -8,6 +8,10 @@ Chaque version publiée est disponible en téléchargement, prête à ouvrir dan
 
 ## [Non publié]
 
+### Ajouté
+- Accueil : bandeau « Voyage d'exemple » quand le coffre contient le voyage de démonstration (réglage `demo`), avec un accès direct à la remise à zéro dans les réglages.
+- Réglages : `openSettings(section)` fait défiler l'onglet jusqu'à une section et la met en évidence.
+
 ## [1.0.0] - 2026-11-23
 
 Première version publique : un coffre Obsidian prêt à l'emploi, avec un voyage d'exemple fictif (« Kyoto sous les érables »).

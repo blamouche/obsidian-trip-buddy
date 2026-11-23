@@ -378,13 +378,27 @@ class TripBuddyPlugin extends Plugin {
     new Notice('⚙️ Réglages Trip Buddy rechargés');
   }
 
-  openSettings() {
+  /** Ouvre l'onglet de réglages du module ; `section` : identifiant d'une section (ex. 'reset') à faire défiler et mettre en évidence */
+  openSettings(section) {
     try {
       this.app.setting.open();
       this.app.setting.openTabById(this.manifest.id);
     } catch (e) {
       new Notice('Ouvrez Réglages → Trip Buddy');
+      return;
     }
+    if (!section) return;
+    // l'onglet est construit à l'ouverture : on attend son rendu avant de défiler
+    const reveal = (tries) => {
+      const root = this.settingTab && this.settingTab.containerEl;
+      const h = root && root.querySelector(`[data-tb-section="${section}"]`);
+      if (!h) { if (tries > 0) setTimeout(() => reveal(tries - 1), 80); return; }
+      h.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      h.removeClass('is-flash');
+      void h.offsetWidth;
+      h.addClass('is-flash');
+    };
+    requestAnimationFrame(() => reveal(10));
   }
 
   /* ------------------------------------------------------------ helpers */
@@ -973,6 +987,7 @@ class TripBuddyPlugin extends Plugin {
       destination: DEFAULT_SETTINGS.trip.destination, start: '', end: '', budget: 0, travelers: [],
     });
     (s.expenseCategories || []).forEach((c) => { if (c.budget) c.budget = 0; });
+    s.demo = false; // plus de bandeau « voyage d'exemple » sur l'accueil
     if (s.booklet) { s.booklet.cover = ''; s.booklet.coverTitle = ''; }
     U.storeSet('plannerDay', null);
     U.storeSet('lastPayer', '');

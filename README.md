@@ -73,6 +73,7 @@ La **barre de navigation** en haut de chaque page (bloc `tripbuddy-nav`) mène a
 
 ## 🏠 Accueil (tableau de bord)
 - **En-tête** : emoji, destination, nom et dates du voyage (nombre de jours), statut (à venir / en cours / terminé), avatars des voyageurs, accès aux réglages ⚙️ et sélecteur de thème 🎨 / 🌙. Le **dégradé de fond reprend les couleurs de l'emoji du voyage** (🇮🇹 rouge → vert, 🌸 rose, ✈️ bleu…), assombries pour que le texte reste lisible, et en version plus sombre avec le thème 🌙 ; un emoji sans couleur (⚫, 🐘…) garde le dégradé par défaut.
+- **Bandeau « Voyage d'exemple »** (tant que `demo` vaut `true` dans `trip-buddy.json`, c'est le cas du coffre téléchargé) : rappelle que le voyage est fictif, avec un bouton **🧹 Repartir de zéro** qui ouvre directement la section *Préparer un nouveau voyage* des réglages. *Masquer ce message* le retire sans rien effacer ; *Vider les données d'exemple* le retire aussi.
 - **Tuiles** avec progression : jours planifiés, lieux géolocalisés, lieux faits, jours écrits dans le journal, budget dépensé / prévu, valise prête (%), nombre de documents. Ctrl/Cmd + clic ouvre dans un nouvel onglet.
 - **Journée en cours** (aujourd'hui pendant le voyage, sinon le prochain jour ou le premier) : étapes du programme, boutons ✍️ Journal et 💸 Dépense, ou 🗓️ *Planifier la journée* si rien n'est prévu.
 - **Carte de tous les lieux** avec l'itinéraire du jour, bouton ⛶ plein écran.
@@ -363,7 +364,7 @@ Tous les réglages du module vivent dans `trip-buddy.json` à la racine du coffr
 | `poiCategories` | Catégories de lieux : `{ "id", "label", "icon", "color" }` ; `id` est la valeur de `category` dans les fiches POI. |
 | `expenseCategories` · `currencies` | Catégories de dépenses (avec `budget`) · devises et taux de conversion. |
 | `map` · `mapLinks` · `transit` · `geocoder` | Fond et centre de carte, services « Itinéraire / Ouvrir dans », réseaux de transports en commun, langue et pays du géocodage. |
-| `display` · `navOrder` · `navHidden` · `autoHideSidebars` · `openHomeOnStartup` · `openHomeWhenEmpty` | Affichage, ordre du menu, rubriques masquées du menu (`navHidden`, clés `home`, `programme`, `map`, `pois`, `guide`, `journal`, `budget`, `packing`, `documents`), repli des colonnes, page d'accueil au démarrage. |
+| `display` · `navOrder` · `navHidden` · `demo` · `autoHideSidebars` · `openHomeOnStartup` · `openHomeWhenEmpty` | Affichage, ordre du menu, rubriques masquées du menu (`navHidden`, clés `home`, `programme`, `map`, `pois`, `guide`, `journal`, `budget`, `packing`, `documents`), repli des colonnes, page d'accueil au démarrage ; `demo` (`true` = coffre d'exemple : bandeau d'explication sur l'accueil). |
 | `booklet` · `vaultExport` | Derniers choix du carnet souvenir et de l'export PDF. |
 
 ## 🌐 Obsidian mobile / web et services en ligne

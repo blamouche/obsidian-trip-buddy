@@ -9,8 +9,10 @@ class TripBuddySettingTab extends PluginSettingTab {
 
   save() { this.plugin.saveSettings(); }
 
-  heading(c, text, desc) {
+  /** Titre de section ; `id` permet d'y accéder directement (plugin.openSettings(id)) */
+  heading(c, text, desc, id) {
     const h = c.createDiv('tb-set-heading');
+    if (id) h.dataset.tbSection = id;
     h.createEl('h3', { text });
     if (desc) h.createDiv({ cls: 'setting-item-description', text: desc });
   }
@@ -250,7 +252,7 @@ class TripBuddySettingTab extends PluginSettingTab {
       .setDesc('Livret A6 à partir du journal et des lieux visités, imposé pour une impression recto-verso sur A4.')
       .addButton((b) => b.setButtonText('🖨️ Carnet…').onClick(() => new BookletModal(this.plugin).open()));
 
-    this.heading(c, '🧹 Préparer un nouveau voyage', 'Après avoir dupliqué le coffre, videz le contenu d’exemple pour repartir de zéro.');
+    this.heading(c, '🧹 Préparer un nouveau voyage', 'Après avoir dupliqué le coffre, videz le contenu d’exemple pour repartir de zéro.', 'reset');
     new Setting(c).setName('Vider les données d’exemple')
       .setDesc('Repart de zéro, définitivement : efface tout le contenu des dossiers Documents, Journal, POI, Programme et Guide (billets, photos, traces, programmes, entrées de journal, fiches de lieux, pages de guide ajoutées), le contexte du voyage (CONTEXT.md) et le travail des skills de planification, puis vide la corbeille du coffre (.trash) ; retire les réseaux de transports en commun et supprime les cartes hors ligne de cet appareil ; vide le tableau des dépenses et les sections libres (Notes rapides, Idées en vrac…), décoche la valise, remet le guide à blanc, renomme le voyage « My trip » 🧳 et efface participants, destination, dates et budgets. Les modèles, les pages d’accueil des rubriques et la devise sont conservés.')
       .addButton((b) => b.setButtonText('Vider…').setWarning().onClick(() => this.plugin.confirmReset()));
