@@ -52,6 +52,17 @@ class TripBuddySettingTab extends PluginSettingTab {
     };
     render(null, true);
     this.plugin.checkUpdate(false).then((u) => { if (box.isConnected) render(u); });
+
+    // liens permanents : dépôt du projet et dernière version publiée
+    const links = parent.createDiv('tb-set-links');
+    const link = (text, href, title) => {
+      const a = links.createEl('a', { text, href });
+      a.setAttr('title', title);
+      a.setAttr('target', '_blank');
+      a.setAttr('rel', 'noopener');
+    };
+    link('🐙 Dépôt GitHub', REPO_URL, `Code source, documentation et suivi du projet (${REPO})`);
+    link('🏷️ Dernière version', `${REPO_URL}/releases/latest`, 'Notes de version et paquet téléchargeable de la dernière version publiée');
   }
 
   /** Confirmation puis mise à jour du module et des skills */

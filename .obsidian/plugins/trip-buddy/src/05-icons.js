@@ -12,6 +12,7 @@ const ICONS = {
   '📋': 'clipboard-list|clipboard', '🗑️': 'trash-2', '🗑': 'trash-2', '📷': 'camera', '📸': 'camera', '✍️': 'pen-line|pencil',
   '💸': 'receipt', '🧾': 'receipt', '⛶': 'maximize', '✨': 'sparkles', '🔁': 'repeat', '📄': 'file-text', '📃': 'file',
   '📝': 'notebook-pen|file-pen-line|pencil', '📎': 'paperclip', '📌': 'map-pin-plus|map-pin', '＋': 'plus', '↺': 'rotate-ccw',
+  '🐙': 'github|git-branch', '🏷️': 'tag',
   '🙈': 'eye-off', '👁': 'eye', '⬆️': 'upload', '📥': 'cloud-download|download-cloud|download', '💾': 'save', '🎉': 'party-popper|sparkles', '⏳': 'hourglass|loader',
   '⚠️': 'triangle-alert|alert-triangle', '⚠︎': 'triangle-alert|alert-triangle', '💡': 'lightbulb', '📖': 'book-open',
   '⏱️': 'clock', '🎟️': 'ticket', '🚗': 'car', '🧳': 'luggage|briefcase', '✅': 'circle-check|check-circle-2',

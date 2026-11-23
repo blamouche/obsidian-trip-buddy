@@ -8,6 +8,9 @@ Chaque version publiée est disponible en téléchargement, prête à ouvrir dan
 
 ## [Non publié]
 
+### Ajouté
+- Réglages : liens vers le dépôt GitHub et vers la dernière version publiée.
+
 ## [1.2.0] - 2026-11-23
 
 ### Ajouté

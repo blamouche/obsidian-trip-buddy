@@ -328,7 +328,7 @@ Toutes préfixées par **Trip Buddy :** dans la palette de commandes (Ctrl/Cmd +
 Le « jour courant » est aujourd'hui si l'on est pendant le voyage, sinon le prochain jour du voyage, sinon le premier.
 
 ## ⚙️ Réglages (Réglages → Trip Buddy)
-En haut de l'onglet : le **numéro de version** du module et la **vérification des mises à jour** (bouton *Vérifier* pour relancer).
+En haut de l'onglet : le **numéro de version** du module, la **vérification des mises à jour** (bouton *Vérifier* pour relancer) et deux liens : 🐙 **Dépôt GitHub** (code source, documentation) et 🏷️ **Dernière version** (notes de version et paquet à télécharger).
 
 Toutes les modifications s'appliquent immédiatement à toutes les pages. Les réglages sont enregistrés dans **`trip-buddy.json`, à la racine du coffre** (voir [[#📄 Le fichier trip-buddy.json|plus bas]]).
 
