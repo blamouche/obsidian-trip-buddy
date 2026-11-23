@@ -8,6 +8,8 @@ Chaque version publiée est disponible en téléchargement, prête à ouvrir dan
 
 ## [Non publié]
 
+## [1.2.2] - 2026-11-23
+
 ### Corrigé
 - Mise à jour depuis les réglages : après l'installation, le module rechargé affichait encore l'ancien numéro de version et reproposait la mise à jour (Obsidian garde en mémoire le `manifest.json` lu au démarrage). Le module relit désormais son `manifest.json` au chargement, rafraîchit la copie d'Obsidian avant de se recharger et confirme la version chargée (sinon : invitation à redémarrer Obsidian).
 
