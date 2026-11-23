@@ -8,6 +8,9 @@ Chaque version publiée est disponible en téléchargement, prête à ouvrir dan
 
 ## [Non publié]
 
+### Modifié
+- Panneau et bouton de mise à jour : pictogrammes adaptés (flèche de mise à jour, téléchargement) au lieu des étincelles et de l'emoji ⬇️.
+
 ## [1.2.6] - 2026-11-23
 
 ### Modifié
