@@ -1,0 +1,328 @@
+{
+  "_info": "Réglages du module Trip Buddy. Ce fichier peut être modifié à la main ou par un agent : Obsidian le recharge automatiquement. Garder un JSON valide. Détail des clés : README.md § Réglages.",
+  "trip": {
+    "name": "Kyoto sous les érables",
+    "destination": "Kyoto, Japon",
+    "start": "2026-11-18",
+    "end": "2026-11-26",
+    "travelers": [
+      "Camille",
+      "Thomas",
+      "Inès",
+      "Hugo"
+    ],
+    "currency": "EUR",
+    "budget": 12000,
+    "emoji": "🍁"
+  },
+  "folders": {
+    "documents": "01 Documents",
+    "journal": "02 Journal",
+    "poi": "05 POI",
+    "programme": "06 Programme",
+    "guide": "08 Guide",
+    "templates": "99 Modèles"
+  },
+  "files": {
+    "home": "00 Accueil.md",
+    "documents": "01 Documents/Documents.md",
+    "journal": "02 Journal/Journal.md",
+    "budget": "03 Budget/Budget.md",
+    "packing": "04 Packing/Packing list.md",
+    "pois": "05 POI/Index des POI.md",
+    "programme": "06 Programme/Programme.md",
+    "map": "07 Carte/Carte.md",
+    "guide": "08 Guide/Guide.md"
+  },
+  "templates": {
+    "poi": "POI.md",
+    "journal": "Journal.md",
+    "programme": "Programme.md"
+  },
+  "poiCategories": [
+    {
+      "id": "monument",
+      "label": "Monument",
+      "icon": "🏛️",
+      "color": "#c27c0e"
+    },
+    {
+      "id": "musee",
+      "label": "Musée",
+      "icon": "🖼️",
+      "color": "#7c3aed"
+    },
+    {
+      "id": "point-de-vue",
+      "label": "Point de vue",
+      "icon": "🌅",
+      "color": "#ea580c"
+    },
+    {
+      "id": "restaurant",
+      "label": "Restaurant",
+      "icon": "🍽️",
+      "color": "#dc2626"
+    },
+    {
+      "id": "cafe",
+      "label": "Café & pâtisserie",
+      "icon": "☕",
+      "color": "#92400e"
+    },
+    {
+      "id": "bar",
+      "label": "Bar & brasserie",
+      "icon": "🍺",
+      "color": "#b45309"
+    },
+    {
+      "id": "nature",
+      "label": "Nature & parc",
+      "icon": "🌳",
+      "color": "#16a34a"
+    },
+    {
+      "id": "plage",
+      "label": "Plage",
+      "icon": "🏖️",
+      "color": "#0891b2"
+    },
+    {
+      "id": "marche",
+      "label": "Marché",
+      "icon": "🧺",
+      "color": "#65a30d"
+    },
+    {
+      "id": "shopping",
+      "label": "Shopping",
+      "icon": "🛍️",
+      "color": "#db2777"
+    },
+    {
+      "id": "quartier",
+      "label": "Quartier",
+      "icon": "🏘️",
+      "color": "#2563eb"
+    },
+    {
+      "id": "hebergement",
+      "label": "Hébergement",
+      "icon": "🛏️",
+      "color": "#ffdd00"
+    },
+    {
+      "id": "transport",
+      "label": "Transport",
+      "icon": "🚉",
+      "color": "#0d9488"
+    },
+    {
+      "id": "disquaire",
+      "label": "Disquaire",
+      "icon": "🎵",
+      "color": "#3b82f6"
+    },
+    {
+      "id": "randonnee",
+      "label": "Randonnée & balade",
+      "icon": "🥾",
+      "color": "#6d4c9f"
+    },
+    {
+      "id": "temple",
+      "label": "Temple & sanctuaire",
+      "icon": "⛩️",
+      "color": "#b91c1c"
+    },
+    {
+      "id": "the",
+      "label": "Salon de thé",
+      "icon": "🍵",
+      "color": "#4d7c0f"
+    },
+    {
+      "id": "artisanat",
+      "label": "Artisanat & céramique",
+      "icon": "🏺",
+      "color": "#a16207"
+    },
+    {
+      "id": "bain",
+      "label": "Sentō & onsen",
+      "icon": "♨️",
+      "color": "#0e7490"
+    }
+  ],
+  "expenseCategories": [
+    {
+      "id": "transport",
+      "label": "Transport",
+      "icon": "✈️",
+      "color": "#2a78d6",
+      "budget": 3400
+    },
+    {
+      "id": "hebergement",
+      "label": "Hébergement",
+      "icon": "🛏️",
+      "color": "#eb6834",
+      "budget": 3900
+    },
+    {
+      "id": "restauration",
+      "label": "Restauration",
+      "icon": "🍽️",
+      "color": "#1baf7a",
+      "budget": 2200
+    },
+    {
+      "id": "activites",
+      "label": "Activités",
+      "icon": "🎟️",
+      "color": "#eda100",
+      "budget": 300
+    },
+    {
+      "id": "shopping",
+      "label": "Shopping",
+      "icon": "🛍️",
+      "color": "#e87ba4",
+      "budget": 1100
+    },
+    {
+      "id": "divers",
+      "label": "Divers",
+      "icon": "📦",
+      "color": "#6250d6",
+      "budget": 400
+    },
+    {
+      "id": "visites",
+      "label": "Visites",
+      "icon": "🏛️",
+      "color": "#64748b",
+      "budget": 700
+    }
+  ],
+  "currencies": [
+    {
+      "code": "EUR",
+      "rate": 1
+    },
+    {
+      "code": "USD",
+      "rate": 0.92
+    },
+    {
+      "code": "GBP",
+      "rate": 1.17
+    },
+    {
+      "code": "JPY",
+      "rate": 0.0058
+    }
+  ],
+  "map": {
+    "tiles": "osm",
+    "customUrl": "",
+    "lat": 35.0116,
+    "lon": 135.7681,
+    "zoom": 12,
+    "showTracks": true
+  },
+  "transit": {
+    "show": true,
+    "networks": []
+  },
+  "geocoder": {
+    "lang": "fr",
+    "countryCodes": "jp"
+  },
+  "openHomeOnStartup": true,
+  "openHomeWhenEmpty": true,
+  "mapLinks": {
+    "open": "google",
+    "directions": "google",
+    "custom": []
+  },
+  "display": {
+    "hideProperties": true,
+    "hideInlineTitle": true,
+    "journalQuickAdd": true,
+    "pageWidth": "wide",
+    "theme": "default",
+    "iconStyle": "line",
+    "readingMode": true,
+    "attachmentFolder": "01 Documents/Photos",
+    "showHiddenFiles": true,
+    "hiddenExclude": ".git, .trash, .DS_Store"
+  },
+  "navOrder": [
+    "home",
+    "programme",
+    "map",
+    "pois",
+    "journal",
+    "budget",
+    "documents",
+    "guide",
+    "packing"
+  ],
+  "navHidden": [],
+  "autoHideSidebars": {
+    "enabled": true,
+    "delay": 10,
+    "sides": "both"
+  },
+  "booklet": {
+    "font": "classique",
+    "cover": "",
+    "coverTitle": "",
+    "coverDest": true,
+    "coverDates": true,
+    "coverTravelers": true,
+    "summary": true,
+    "map": true,
+    "tracks": true,
+    "index": true,
+    "notes": true,
+    "backCover": true,
+    "dayDate": true,
+    "dayLocation": true,
+    "dayWeather": true,
+    "dayMood": true,
+    "dayCover": true,
+    "texts": true,
+    "photos": true,
+    "dayPlaces": true,
+    "planned": true,
+    "dayMap": true,
+    "dayProfile": true,
+    "placeCat": true,
+    "placeRating": true,
+    "placeAddress": true,
+    "placeDate": true
+  },
+  "vaultExport": {
+    "font": "moderne",
+    "programme": true,
+    "places": true,
+    "journal": true,
+    "map": true,
+    "photos": true,
+    "budget": true,
+    "attachments": true,
+    "toc": true,
+    "properties": true,
+    "images": true,
+    "allPlaces": false,
+    "pageBreak": false,
+    "exclude": [
+      "99 Modèles"
+    ],
+    "blocks": true,
+    "looseImages": true
+  }
+}

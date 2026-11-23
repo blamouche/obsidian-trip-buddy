@@ -1,0 +1,13 @@
+# Système
+.DS_Store
+
+# Obsidian : corbeille, état des fenêtres (propres à chaque appareil)
+.trash/
+.obsidian/workspace*.json
+
+# Plugin de synchronisation (identifiants) et copies de secours des réglages
+.obsidian/plugins/remotely-save/
+.obsidian/plugins/*/data.json
+
+# Verrou temporaire du géocodage
+.trip-planner/.nominatim-lock
