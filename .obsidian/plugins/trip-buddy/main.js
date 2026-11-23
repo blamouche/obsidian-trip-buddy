@@ -121,6 +121,10 @@ const SKILL_DATA = {
 /* Nom et emoji donnés au voyage par « Vider les données d'exemple ». */
 const NEW_TRIP = { name: 'My trip', emoji: '🧳' };
 
+/* Dépôt GitHub du projet : versions publiées (vérification des mises à jour dans les réglages). */
+const REPO = 'blamouche/obsidian-trip-buddy';
+const REPO_URL = `https://github.com/${REPO}`;
+
 const DEFAULT_SETTINGS = {
   trip: {
     name: 'Mon voyage',
@@ -228,6 +232,14 @@ const DEFAULT_SETTINGS = {
 /* ------------------------------------------------------------------ utils */
 const U = {
   pad2: (n) => String(n).padStart(2, '0'),
+
+  /** Compare deux numéros de version X.Y.Z : 1 si a > b, -1 si a < b, 0 si égaux */
+  semverCmp(a, b) {
+    const p = (v) => String(v || '').replace(/^v/, '').split(/[.+-]/).slice(0, 3).map((n) => parseInt(n, 10) || 0);
+    const x = p(a), y = p(b);
+    for (let i = 0; i < 3; i++) if (x[i] !== y[i]) return x[i] > y[i] ? 1 : -1;
+    return 0;
+  },
 
   isoDate(d) {
     if (!d) return '';
@@ -8987,6 +8999,45 @@ class TripBuddySettingTab extends PluginSettingTab {
 
   save() { this.plugin.saveSettings(); }
 
+  /** Numéro de version du module + vérification d'une version plus récente sur GitHub */
+  versionBox(parent) {
+    const box = parent.createDiv('tb-set-version');
+    const render = (u, busy) => {
+      box.empty();
+      box.createSpan({ cls: 'tb-set-version-num', text: `Version ${this.plugin.manifest.version}` });
+      const st = box.createSpan('tb-set-update');
+      const recheck = () => { render(null, true); this.plugin.checkUpdate(true).then((r) => render(r)); };
+      if (busy || !u) {
+        st.setText('Recherche de mise à jour…');
+        st.addClass('is-busy');
+        return;
+      }
+      if (!u.ok) {
+        st.setText('⚠️ Impossible de vérifier les mises à jour');
+        st.setAttr('title', u.error);
+        st.addClass('is-error');
+      } else if (u.newer) {
+        st.addClass('is-new');
+        st.appendText(`🆕 Version ${u.latest} disponible`);
+        const links = box.createDiv('tb-set-update-links');
+        links.createEl('a', { text: 'Voir les nouveautés', href: u.url });
+        if (u.download) links.createEl('a', { text: 'Télécharger le paquet', href: u.download });
+        links.createDiv({
+          cls: 'setting-item-description',
+          text: 'Pour mettre à jour : remplacez le dossier .obsidian/plugins/trip-buddy de ce coffre par celui du paquet, puis désactivez / réactivez Trip Buddy. Vos notes et vos réglages (trip-buddy.json) sont conservés.',
+        });
+      } else {
+        st.setText('✅ À jour');
+        st.addClass('is-ok');
+      }
+      const again = box.createEl('button', { cls: 'tb-btn-link tb-set-update-check', text: 'Vérifier' });
+      again.setAttr('title', 'Rechercher une nouvelle version sur GitHub');
+      again.addEventListener('click', (e) => { e.preventDefault(); recheck(); });
+    };
+    render(null, true);
+    this.plugin.checkUpdate(false).then((u) => { if (box.isConnected) render(u); });
+  }
+
   /** Titre de section ; `id` permet d'y accéder directement (plugin.openSettings(id)) */
   heading(c, text, desc, id) {
     const h = c.createDiv('tb-set-heading');
@@ -9015,6 +9066,7 @@ class TripBuddySettingTab extends PluginSettingTab {
     const it = intro.createDiv();
     it.createEl('h2', { text: 'Trip Buddy' });
     it.createDiv({ cls: 'setting-item-description', text: 'Tout le paramétrage du voyage est ici. Les modifications sont appliquées immédiatement à toutes les pages.' });
+    this.versionBox(it);
 
     /* ------------------------------------------------------------ voyage */
     this.heading(c, '✈️ Le voyage');
@@ -10104,6 +10156,37 @@ class TripBuddyPlugin extends Plugin {
     const tab = this.settingTab;
     if (tab && this.app.setting && this.app.setting.activeTab === tab) tab.display();
     new Notice('⚙️ Réglages Trip Buddy rechargés');
+  }
+
+  /** Dernière version publiée sur GitHub (releases/latest, pré-versions exclues), mise en cache 6 h.
+   *  Renvoie { ok, current, latest, newer, url, download, date } ou { ok: false, error, current }.
+   *  Seul appel : api.github.com, sans aucune donnée du voyage. */
+  async checkUpdate(force) {
+    const now = Date.now();
+    if (!force && this.updateInfo && now - this.updateInfo.at < 6 * 3600e3) return this.updateInfo;
+    const current = this.manifest.version;
+    let res;
+    try {
+      const r = await requestUrl({
+        url: `https://api.github.com/repos/${REPO}/releases/latest`,
+        headers: { Accept: 'application/vnd.github+json' },
+        throw: false,
+      });
+      if (r.status !== 200) throw new Error(`GitHub a répondu ${r.status}`);
+      const j = r.json || {};
+      const latest = String(j.tag_name || '').replace(/^v/, '');
+      if (!latest) throw new Error('réponse inattendue');
+      const asset = (j.assets || []).find((a) => /\.zip$/i.test(a.name));
+      res = {
+        ok: true, current, latest, newer: U.semverCmp(latest, current) > 0,
+        url: j.html_url || `${REPO_URL}/releases/latest`, download: asset ? asset.browser_download_url : null, date: j.published_at || '',
+      };
+    } catch (e) {
+      res = { ok: false, current, error: (e && e.message) || String(e) };
+    }
+    res.at = now;
+    this.updateInfo = res;
+    return res;
   }
 
   /** Ouvre l'onglet de réglages du module ; `section` : identifiant d'une section (ex. 'reset') à faire défiler et mettre en évidence */

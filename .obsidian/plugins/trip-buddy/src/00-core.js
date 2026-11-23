@@ -87,6 +87,10 @@ const SKILL_DATA = {
 /* Nom et emoji donnés au voyage par « Vider les données d'exemple ». */
 const NEW_TRIP = { name: 'My trip', emoji: '🧳' };
 
+/* Dépôt GitHub du projet : versions publiées (vérification des mises à jour dans les réglages). */
+const REPO = 'blamouche/obsidian-trip-buddy';
+const REPO_URL = `https://github.com/${REPO}`;
+
 const DEFAULT_SETTINGS = {
   trip: {
     name: 'Mon voyage',
@@ -194,6 +198,14 @@ const DEFAULT_SETTINGS = {
 /* ------------------------------------------------------------------ utils */
 const U = {
   pad2: (n) => String(n).padStart(2, '0'),
+
+  /** Compare deux numéros de version X.Y.Z : 1 si a > b, -1 si a < b, 0 si égaux */
+  semverCmp(a, b) {
+    const p = (v) => String(v || '').replace(/^v/, '').split(/[.+-]/).slice(0, 3).map((n) => parseInt(n, 10) || 0);
+    const x = p(a), y = p(b);
+    for (let i = 0; i < 3; i++) if (x[i] !== y[i]) return x[i] > y[i] ? 1 : -1;
+    return 0;
+  },
 
   isoDate(d) {
     if (!d) return '';

@@ -1,0 +1,55 @@
+# Paquet de développement : à chaque mise à jour de main, construit le coffre prêt à l'emploi
+# (trip-buddy-vX.Y.Z-dev.N-<commit>.zip) et le publie en pré-version (tag dev-N) ;
+# la pré-version précédente est supprimée. La dernière version stable (releases/latest) n'est pas touchée.
+name: Paquet de développement
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-main
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Construire le paquet
+        run: |
+          VERSION="$(sed -n 's/.*"version": *"\([^"]*\)".*/\1/p' .obsidian/plugins/trip-buddy/manifest.json | head -1)"
+          LABEL="dev.${GITHUB_RUN_NUMBER}-${GITHUB_SHA::7}"
+          sh .github/scripts/package.sh "$VERSION" dist "$LABEL"
+          echo "NAME=$(cat dist/package-name.txt)" >> "$GITHUB_ENV"
+
+      - name: Conserver le paquet (artefact du build)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.NAME }}
+          path: dist/${{ env.NAME }}.zip
+          retention-days: 30
+
+      - name: Publier la pré-version de développement
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="dev-${GITHUB_RUN_NUMBER}"
+          gh release create "$TAG" "dist/$NAME.zip" \
+            --target "$GITHUB_SHA" \
+            --prerelease \
+            --title "Trip Buddy — développement ${NAME#trip-buddy-v}" \
+            --notes-file dist/release-notes.md
+          # une seule pré-version de développement à la fois : on retire les précédentes (et leurs tags)
+          gh release list --limit 100 --json tagName --jq '.[].tagName' \
+            | { grep '^dev-' || true; } | { grep -vx "$TAG" || true; } \
+            | while read -r old; do gh release delete "$old" --cleanup-tag --yes; done

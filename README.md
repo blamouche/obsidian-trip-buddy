@@ -28,6 +28,10 @@ Il rassemble dans un seul coffre : les lieux à voir (POI géocodés), une carte
 ## 🚀 Démarrage
 **Télécharger** : chaque version est publiée, prête à l'emploi, sur la page [Releases](https://github.com/blamouche/obsidian-trip-buddy/releases/latest) du dépôt. Téléchargez `trip-buddy-vX.Y.Z.zip`, décompressez-le, puis dans Obsidian choisissez *Ouvrir un dossier comme coffre* → dossier **Trip Buddy**. Les nouveautés de chaque version sont dans [[CHANGELOG]].
 
+**Mettre à jour** : le numéro de version et l'état des mises à jour sont affichés en haut de **Réglages → Trip Buddy** (✅ à jour, ou 🆕 version disponible avec les liens vers les nouveautés et le paquet). Pour passer à la nouvelle version, remplacez le dossier `.obsidian/plugins/trip-buddy` de votre coffre par celui du paquet, puis désactivez / réactivez Trip Buddy : vos notes et vos réglages (`trip-buddy.json`) sont conservés. Les skills se mettent à jour de la même façon (dossier `.claude/skills`).
+
+**Version de développement** : à chaque mise à jour de la branche `main`, un paquet `trip-buddy-vX.Y.Z-dev.N-<commit>.zip` est construit et publié en *pré-version* sur la page [Releases](https://github.com/blamouche/obsidian-trip-buddy/releases) (une seule à la fois). Il contient les nouveautés pas encore publiées : à réserver aux tests.
+
 1. Ouvrez le coffre puis, si Obsidian le demande, **faites confiance à l'auteur** et activez les plugins communautaires (Réglages → Plugins communautaires → *Trip Buddy* activé).
 2. Ouvrez [[00 Accueil]] : c'est le tableau de bord du voyage (il s'ouvre aussi tout seul au démarrage).
 3. Réglez le voyage dans **Réglages → Trip Buddy** (ou ⚙️ sur l'accueil) : nom, destination, emoji, dates, voyageurs, devise, budget, catégories…
@@ -320,6 +324,8 @@ Toutes préfixées par **Trip Buddy :** dans la palette de commandes (Ctrl/Cmd +
 Le « jour courant » est aujourd'hui si l'on est pendant le voyage, sinon le prochain jour du voyage, sinon le premier.
 
 ## ⚙️ Réglages (Réglages → Trip Buddy)
+En haut de l'onglet : le **numéro de version** du module et la **vérification des mises à jour** (bouton *Vérifier* pour relancer).
+
 Toutes les modifications s'appliquent immédiatement à toutes les pages. Les réglages sont enregistrés dans **`trip-buddy.json`, à la racine du coffre** (voir [[#📄 Le fichier trip-buddy.json|plus bas]]).
 
 | Section | Contenu |
@@ -376,6 +382,7 @@ Services utilisés (tous sans clé d'API), uniquement à la demande :
 | Nominatim (OpenStreetMap) | Recherche d'adresses, adresse d'un point, emprise d'une ville |
 | Serveurs de tuiles (OSM, OSM France, OpenTopoMap, Esri, CyclOSM) | Fonds de carte, cartes hors ligne, cartes des PDF |
 | Overpass API | Téléchargement des réseaux de transports en commun |
+| GitHub (`api.github.com`) | Vérification d'une nouvelle version, à l'ouverture des réglages (au plus toutes les 6 h ; aucune donnée du voyage envoyée) |
 | Google Maps / OpenStreetMap / votre service | Liens *Itinéraire*, *Ouvrir dans*, *Rechercher sur Google* (ouverts dans le navigateur) |
 
 Sans connexion : les notes, le programme, le budget, le journal, les traces GPX, les réseaux de transports déjà chargés et les zones de carte téléchargées restent disponibles.
@@ -413,6 +420,7 @@ sh .github/scripts/release.sh 1.1.0
 ```
 
   Le script transforme *Non publié* en section `[1.1.0]` datée, met le numéro à jour (manifest et ce mode d'emploi), reconstruit le module, vérifie le paquet, commite « Version 1.1.0 », pose le tag `v1.1.0` et pousse. Le tag déclenche l'action GitHub *Release* (`.github/workflows/release.yml`) qui publie `trip-buddy-v1.1.0.zip` — le coffre complet, CHANGELOG compris — avec la section du CHANGELOG comme notes de version.
+- **Paquet de développement automatique** : à chaque push sur `main`, l'action *Paquet de développement* (`.github/workflows/build-main.yml`) construit `trip-buddy-vX.Y.Z-dev.N-<commit>.zip` (X.Y.Z = dernière version publiée, N = numéro du build), le garde 30 jours comme artefact du build et le publie en pré-version `dev-N`, en supprimant la précédente. Ses notes reprennent la section *Non publié* du CHANGELOG. La dernière version stable (`releases/latest`) et la vérification des mises à jour ne sont pas concernées.
 - Tester le paquet en local sans rien publier : `sh .github/scripts/package.sh <version actuelle> dist` (le dossier `dist/` est ignoré par git).
 - Le paquet contient les fichiers suivis par git, sauf l'outillage du dépôt (`.github`, `.gitignore`, `.gitattributes`) : jamais `.trash`, l'état des fenêtres ni les réglages de synchronisation.
 

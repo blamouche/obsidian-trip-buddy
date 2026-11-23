@@ -11,6 +11,8 @@ Chaque version publiée est disponible en téléchargement, prête à ouvrir dan
 ### Ajouté
 - Accueil : bandeau « Voyage d'exemple » quand le coffre contient le voyage de démonstration (réglage `demo`), avec un accès direct à la remise à zéro dans les réglages.
 - Réglages : `openSettings(section)` fait défiler l'onglet jusqu'à une section et la met en évidence.
+- Réglages : numéro de version du module et vérification des mises à jour sur GitHub (✅ à jour / 🆕 version disponible, avec liens vers les nouveautés et le paquet).
+- Paquet de développement construit automatiquement à chaque mise à jour de `main`, publié en pré-version sur GitHub.
 
 ## [1.0.0] - 2026-11-23
 

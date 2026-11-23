@@ -378,6 +378,37 @@ class TripBuddyPlugin extends Plugin {
     new Notice('⚙️ Réglages Trip Buddy rechargés');
   }
 
+  /** Dernière version publiée sur GitHub (releases/latest, pré-versions exclues), mise en cache 6 h.
+   *  Renvoie { ok, current, latest, newer, url, download, date } ou { ok: false, error, current }.
+   *  Seul appel : api.github.com, sans aucune donnée du voyage. */
+  async checkUpdate(force) {
+    const now = Date.now();
+    if (!force && this.updateInfo && now - this.updateInfo.at < 6 * 3600e3) return this.updateInfo;
+    const current = this.manifest.version;
+    let res;
+    try {
+      const r = await requestUrl({
+        url: `https://api.github.com/repos/${REPO}/releases/latest`,
+        headers: { Accept: 'application/vnd.github+json' },
+        throw: false,
+      });
+      if (r.status !== 200) throw new Error(`GitHub a répondu ${r.status}`);
+      const j = r.json || {};
+      const latest = String(j.tag_name || '').replace(/^v/, '');
+      if (!latest) throw new Error('réponse inattendue');
+      const asset = (j.assets || []).find((a) => /\.zip$/i.test(a.name));
+      res = {
+        ok: true, current, latest, newer: U.semverCmp(latest, current) > 0,
+        url: j.html_url || `${REPO_URL}/releases/latest`, download: asset ? asset.browser_download_url : null, date: j.published_at || '',
+      };
+    } catch (e) {
+      res = { ok: false, current, error: (e && e.message) || String(e) };
+    }
+    res.at = now;
+    this.updateInfo = res;
+    return res;
+  }
+
   /** Ouvre l'onglet de réglages du module ; `section` : identifiant d'une section (ex. 'reset') à faire défiler et mettre en évidence */
   openSettings(section) {
     try {

@@ -9,6 +9,45 @@ class TripBuddySettingTab extends PluginSettingTab {
 
   save() { this.plugin.saveSettings(); }
 
+  /** Numéro de version du module + vérification d'une version plus récente sur GitHub */
+  versionBox(parent) {
+    const box = parent.createDiv('tb-set-version');
+    const render = (u, busy) => {
+      box.empty();
+      box.createSpan({ cls: 'tb-set-version-num', text: `Version ${this.plugin.manifest.version}` });
+      const st = box.createSpan('tb-set-update');
+      const recheck = () => { render(null, true); this.plugin.checkUpdate(true).then((r) => render(r)); };
+      if (busy || !u) {
+        st.setText('Recherche de mise à jour…');
+        st.addClass('is-busy');
+        return;
+      }
+      if (!u.ok) {
+        st.setText('⚠️ Impossible de vérifier les mises à jour');
+        st.setAttr('title', u.error);
+        st.addClass('is-error');
+      } else if (u.newer) {
+        st.addClass('is-new');
+        st.appendText(`🆕 Version ${u.latest} disponible`);
+        const links = box.createDiv('tb-set-update-links');
+        links.createEl('a', { text: 'Voir les nouveautés', href: u.url });
+        if (u.download) links.createEl('a', { text: 'Télécharger le paquet', href: u.download });
+        links.createDiv({
+          cls: 'setting-item-description',
+          text: 'Pour mettre à jour : remplacez le dossier .obsidian/plugins/trip-buddy de ce coffre par celui du paquet, puis désactivez / réactivez Trip Buddy. Vos notes et vos réglages (trip-buddy.json) sont conservés.',
+        });
+      } else {
+        st.setText('✅ À jour');
+        st.addClass('is-ok');
+      }
+      const again = box.createEl('button', { cls: 'tb-btn-link tb-set-update-check', text: 'Vérifier' });
+      again.setAttr('title', 'Rechercher une nouvelle version sur GitHub');
+      again.addEventListener('click', (e) => { e.preventDefault(); recheck(); });
+    };
+    render(null, true);
+    this.plugin.checkUpdate(false).then((u) => { if (box.isConnected) render(u); });
+  }
+
   /** Titre de section ; `id` permet d'y accéder directement (plugin.openSettings(id)) */
   heading(c, text, desc, id) {
     const h = c.createDiv('tb-set-heading');
@@ -37,6 +76,7 @@ class TripBuddySettingTab extends PluginSettingTab {
     const it = intro.createDiv();
     it.createEl('h2', { text: 'Trip Buddy' });
     it.createDiv({ cls: 'setting-item-description', text: 'Tout le paramétrage du voyage est ici. Les modifications sont appliquées immédiatement à toutes les pages.' });
+    this.versionBox(it);
 
     /* ------------------------------------------------------------ voyage */
     this.heading(c, '✈️ Le voyage');

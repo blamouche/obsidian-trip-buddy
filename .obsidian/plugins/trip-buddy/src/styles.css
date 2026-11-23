@@ -597,6 +597,15 @@ li > .tb-inline-edit { margin: 4px 0 6px; }
 .tb-set-intro { display: flex; gap: 14px; align-items: center; padding: 14px 16px; border-radius: 16px; margin-bottom: 10px; background: linear-gradient(135deg, rgba(14, 165, 233, .14), rgba(236, 72, 153, .1)); }
 .tb-set-intro h2 { margin: 0; }
 .tb-set-logo { font-size: 36px; }
+.tb-set-version { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 6px; font-size: 13px; }
+.tb-set-version-num { font-weight: 700; padding: 1px 9px; border-radius: 99px; background: var(--background-primary); border: 1px solid var(--background-modifier-border); }
+.tb-set-update { color: var(--text-muted); }
+.tb-set-update.is-ok { color: var(--tb-good); font-weight: 600; }
+.tb-set-update.is-new { color: var(--tb-accent); font-weight: 700; }
+.tb-set-update.is-error { color: var(--tb-warn); }
+.tb-set-update-check { font-size: 12px !important; min-height: 0 !important; height: auto !important; padding: 0 !important; }
+.tb-set-update-links { flex-basis: 100%; display: flex; gap: 14px; flex-wrap: wrap; align-items: baseline; }
+.tb-set-update-links .setting-item-description { flex-basis: 100%; }
 .tb-set-heading { margin-top: 26px; padding-bottom: 6px; border-bottom: 1px solid var(--background-modifier-border); }
 .tb-set-heading h3 { margin: 0 0 2px; }
 .tb-set-heading.is-flash { animation: tb-flash 2.2s ease-out; border-radius: 10px; }
