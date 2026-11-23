@@ -417,7 +417,10 @@ class TripBuddyPlugin extends Plugin {
    *  l'ancien onglet a disparu et la fenêtre reste blanche. On y rouvre le nouvel onglet. */
   reopenSettingsAfterReload() {
     const st = this.app.setting;
-    if (!st || !st.containerEl || !st.containerEl.isConnected) return;
+    // la fenêtre des réglages peut être une fenêtre à part (Obsidian 1.15+) : son containerEl n'est
+    // alors pas dans le document principal, d'où le recours à isOpen
+    const isOpen = () => !!st && (st.isOpen === true || !!(st.containerEl && st.containerEl.isConnected));
+    if (!isOpen()) return;
     const active = st.activeTab;
     const id = this.manifest.id;
     const stale = !active
@@ -425,7 +428,7 @@ class TripBuddyPlugin extends Plugin {
       || (active.containerEl && !active.containerEl.isConnected);
     if (!stale) return;
     setTimeout(() => {
-      try { if (st.containerEl.isConnected) st.openTabById(id); } catch (e) { console.error('[Trip Buddy] réglages', e); }
+      try { if (isOpen()) st.openTabById(id); } catch (e) { console.error('[Trip Buddy] réglages', e); }
     }, 0);
   }
 

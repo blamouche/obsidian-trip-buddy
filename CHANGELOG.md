@@ -8,6 +8,9 @@ Chaque version publiée est disponible en téléchargement, prête à ouvrir dan
 
 ## [Non publié]
 
+### Corrigé
+- Mise à jour depuis les réglages : la page restait encore blanche après le rechargement quand les réglages s'ouvrent dans une fenêtre à part (Obsidian 1.15) — la correction de la 1.2.3 ne détectait pas cette fenêtre. Le module rechargé rouvre maintenant son onglet dans tous les cas.
+
 ## [1.2.3] - 2026-11-23
 
 ### Corrigé
