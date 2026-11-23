@@ -140,6 +140,7 @@ class TripBuddyPlugin extends Plugin {
 
     this.settingTab = new TripBuddySettingTab(this.app, this);
     this.addSettingTab(this.settingTab);
+    this.reopenSettingsAfterReload();
     // réglages modifiés directement dans trip-buddy.json (agent, éditeur, synchronisation)
     const watchSettings = debounce(() => this.onSettingsFileChanged(), 300, true);
     const onFile = (f) => { if (f && f.path === SETTINGS_FILE) watchSettings(); };
@@ -412,6 +413,22 @@ class TripBuddyPlugin extends Plugin {
     return res;
   }
 
+  /** Rechargement du module (mise à jour) pendant que la fenêtre des réglages montrait son onglet :
+   *  l'ancien onglet a disparu et la fenêtre reste blanche. On y rouvre le nouvel onglet. */
+  reopenSettingsAfterReload() {
+    const st = this.app.setting;
+    if (!st || !st.containerEl || !st.containerEl.isConnected) return;
+    const active = st.activeTab;
+    const id = this.manifest.id;
+    const stale = !active
+      || (active.id === id && active !== this.settingTab)
+      || (active.containerEl && !active.containerEl.isConnected);
+    if (!stale) return;
+    setTimeout(() => {
+      try { if (st.containerEl.isConnected) st.openTabById(id); } catch (e) { console.error('[Trip Buddy] réglages', e); }
+    }, 0);
+  }
+
   /** Après une mise à jour, Obsidian peut garder en mémoire l'ancien manifest.json (lu à son démarrage) :
    *  on relit celui du disque pour que le numéro de version affiché soit celui du code chargé. */
   async syncManifest() {
@@ -456,7 +473,7 @@ class TripBuddyPlugin extends Plugin {
         const v = loaded && loaded.manifest && loaded.manifest.version;
         if (v !== expected) throw new Error(`version chargée : ${v || 'inconnue'}`);
         new Notice(`🎉 Trip Buddy ${v} est chargé.`, 6000);
-        if (app.setting && app.setting.containerEl && app.setting.containerEl.isConnected) app.setting.openTabById(id);
+        // l'onglet des réglages est rouvert par le module rechargé (reopenSettingsAfterReload)
       } catch (e) {
         console.error('[Trip Buddy] rechargement', e);
         new Notice(`Les fichiers de la version ${expected} sont installés. Redémarrez Obsidian pour la charger.`, 0);
