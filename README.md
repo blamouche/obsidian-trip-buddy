@@ -5,7 +5,23 @@ Ce coffre est un **modèle de voyage** : dupliquez-le pour chaque nouveau voyage
 Il rassemble dans un seul coffre : les lieux à voir (POI géocodés), une carte OpenStreetMap, le programme jour par jour, le journal, le budget partagé, la valise, les documents, un guide de la destination, et produit deux PDF : un **carnet souvenir** imprimable et un **export complet** du voyage.
 
 > [!example] Voyage d'exemple
-> Le coffre contient un voyage complet (« Barcelone en amoureux », 20 → 22 novembre 2026) : ~75 lieux, 3 programmes, 3 entrées de journal, un budget, un guide et des documents. Servez-vous-en pour découvrir le module, puis videz-le (voir [[#🧳 Nouveau voyage|Nouveau voyage]]).
+> Le coffre contient un voyage complet et fictif (« Kyoto sous les érables », 18 → 26 novembre 2026, à quatre amis) : 70 lieux, 9 programmes, 6 entrées de journal, un budget, un guide et des documents. Servez-vous-en pour découvrir le module, puis videz-le (voir [[#🧳 Nouveau voyage|Nouveau voyage]]).
+
+## 📸 Aperçu
+*Captures du voyage d'exemple, thème clair.*
+
+![Accueil : en-tête aux couleurs de l'emoji du voyage, tuiles de progression, programme du jour et carte](docs/screenshots/accueil.jpg)
+
+| | |
+| --- | --- |
+| ![Programme jour par jour : étapes ordonnées, temps de trajet et carte de l'itinéraire](docs/screenshots/programme.jpg) | ![Carte de tous les lieux, filtrable par catégorie et par statut](docs/screenshots/carte.jpg) |
+| **🗓️ Programme** : étapes ordonnées, temps de trajet, itinéraire sur la carte | **🗺️ Carte** : tous les lieux, filtres par catégorie et statut |
+| ![Index des lieux : progression par catégorie et fiches classées](docs/screenshots/lieux.jpg) | ![Fiche d'un lieu : photo, adresse, actions, mini-carte et présentation](docs/screenshots/poi.jpg) |
+| **📍 Lieux** : progression par catégorie, recherche, filtres | **🏛️ Fiche d'un lieu** : photo, statut, note, actions, mini-carte, guide |
+| ![Journal : frise des journées racontées, météo et humeur](docs/screenshots/journal.jpg) | ![Budget : dépensé, restant, projection et répartition par catégorie](docs/screenshots/budget.jpg) |
+| **📔 Journal** : frise des journées, météo, humeur, carnet PDF | **💰 Budget** : dépensé, restant, projection, répartition par catégorie |
+| ![Guide de la destination : pages transports, nourriture, langue, histoire…](docs/screenshots/guide.jpg) | |
+| **📚 Guide** : pages pratiques et culturelles sur la destination | |
 
 ---
 
@@ -43,6 +59,7 @@ Deux icônes sont ajoutées dans le ruban de gauche : 🗺️ **carte du voyage*
 | `06 Programme` | Une note par journée planifiée (`Programme AAAA-MM-JJ.md`) + le planificateur. |
 | `07 Carte` | La carte OpenStreetMap de tous les lieux. |
 | `08 Guide` | Le guide de la destination : transports, nourriture, langue, histoire, pourboires, sécurité, numéros utiles, formalités… et vos pages ajoutées. |
+| `docs/screenshots` | Captures d'écran utilisées par ce mode d'emploi (sans effet sur le module). |
 | `99 Modèles` | Modèles de notes (POI, journal, programme) et de valises (`Packing - City trip`, `Packing - Plage`, `Packing - Randonnée`). Les notes de ce dossier sont ignorées par le module. |
 
 Tous ces emplacements se changent dans *Réglages → Trip Buddy → Dossiers et pages*. Les marque-pages d'Obsidian donnent un accès direct aux pages principales.
